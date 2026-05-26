@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DashBoard</title>
+</head>
+<body>
+    <h1>HELLO USER FROM DASHBOARD</h1>
+
+    <% if (message) { %>
+        <h2><%= message %></h2>
+    <% } %>
+
+    <form action="/user/logout" method="get">
+            <button class="logout-btn" type="submit">
+                Logout
+            </button>
+        </form>
+    <form action="/user/photographer" method="get">
+            <button class="logout-btn" type="submit">
+                PhotoGrapher Only link
+            </button>
+        </form>
+</body>
+</html>
