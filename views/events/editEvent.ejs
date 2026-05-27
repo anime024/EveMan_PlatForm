@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Edit Event</title>
+</head>
+<body>
+
+    <h1>Edit Event</h1>
+
+    <form action="/event/edit/<%= event._id %>" method="POST">
+
+        <input
+            type="text"
+            name="title"
+            value="<%= event.title %>"
+        >
+
+        <textarea name="description"><%= event.description %></textarea>
+
+        <input
+            type="text"
+            name="category"
+            value="<%= event.category %>"
+        >
+
+        <input
+            type="date"
+            name="date"
+            value="<%= event.date.toISOString().split('T')[0] %>"
+        >
+
+        <select name="visibility">
+
+            <option value="public"
+            <%= event.visibility==="public" ? "selected" : "" %>>
+            Public
+            </option>
+
+            <option value="private"
+            <%= event.visibility==="private" ? "selected" : "" %>>
+            Private
+            </option>
+
+        </select>
+
+        <button type="submit">
+            Update Event
+        </button>
+
+    </form>
+
+</body>
+</html>

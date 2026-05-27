@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Single Event</title>
+</head>
+<body>
+
+    <h1><%= event.title %></h1>
+
+    <p><%= event.description %></p>
+
+    <p>Category: <%= event.category %></p>
+
+    <p>Visibility: <%= event.visibility %></p>
+
+    <p>Date: <%= event.date.toDateString() %></p>
+
+    <% if( user.role==="admin" || event.createdBy.toString()===user._id){ %>
+
+    <a href="/event/edit/<%= event._id %>">
+        Edit
+    </a>
+
+    <form action="/event/delete/<%= event._id %>" method="POST">
+
+        <button type="submit">
+            Delete
+        </button>
+
+    </form>
+
+<% } %>
+
+</body>
+</html>

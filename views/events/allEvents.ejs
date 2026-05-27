@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>All Events</title>
+</head>
+<body>
+
+    <% if (message) { %>
+        <h2><%= message %></h2>
+    <% } %>
+
+
+    <h1>All Events</h1>
+
+    <form action="/event" method="GET">
+
+    <select name="sort">
+
+        <option value="">
+            Sort Events
+        </option>
+
+        <option value="newest">
+            Newest
+        </option>
+
+        <option value="oldest">
+            Oldest
+        </option>
+
+        <option value="category">
+            Category
+        </option>
+
+    </select>
+
+    <button type="submit">
+        Apply
+    </button>
+
+</form>
+
+<br>
+
+    <a href="/event/create">Create New Event</a>
+
+    <hr>
+
+    <% allEvents.forEach((event)=>{ %>
+
+        <div>
+
+            <h2><%= event.title %></h2>
+
+            <p>Description:<%= event.description %></p>
+            <p>Category:<%= event.category %></p>
+
+            <a href="/event/<%= event._id %>">View Event</a>
+
+        </div>
+
+        <hr>
+
+    <% }) %>
+
+</body>
+</html>

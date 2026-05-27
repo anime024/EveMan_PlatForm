@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Create Event</title>
+
+    <style>
+
+        body{
+            font-family:Arial;
+            padding:40px;
+        }
+
+        form{
+            width:400px;
+            display:flex;
+            flex-direction:column;
+            gap:10px;
+        }
+
+        input,textarea,select,button{
+            padding:10px;
+        }
+
+    </style>
+
+</head>
+<body>
+
+    <h1>Create Event</h1>
+
+    <% if(message){ %>
+        <p><%= message %></p>
+    <% } %>
+
+    <form action="/event/create" method="POST">
+
+        <input type="text" name="title" placeholder="Event Title">
+
+        <textarea name="description" placeholder="Description"></textarea>
+
+        <input type="text" name="category" placeholder="Category">
+
+        <input type="date" name="date">
+
+        <select name="visibility">
+
+            <option value="public">Public</option>
+
+            <option value="private">Private</option>
+
+        </select>
+
+        <button type="submit">Create Event</button>
+
+    </form>
+
+</body>
+</html>
