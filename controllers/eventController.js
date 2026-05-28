@@ -1,5 +1,7 @@
 const {Event}=require("../models/event")
 
+const {User}=require("../models/user")
+
 async function handleGetAllEvents(req, res) {
     try{
         const sort=req.query.sort;
@@ -26,7 +28,7 @@ async function handleGetAllEvents(req, res) {
             filter={$or:[{visibility:"public"},{createdBy:req.user._id}]}
         }
 
-        const allEvents=await Event.find(filter).sort(sortOption);
+        const allEvents=await Event.find(filter).sort(sortOption).populate("createdBy","_id name");
         const message=req.query.msg||null;
         return res.render("events/allEvents",{allEvents,message})
     }catch(error){
@@ -58,11 +60,12 @@ async function handlePostCreateEvent(req, res) {
 
 async function handleGetSingleEvent(req, res) {
     try{
-        const event=await Event.findById(req.params.id);
+        const event=await Event.findById(req.params.id).populate("createdBy","_id name");
         if(!event)
         {
             return res.send("Event not found");
         }
+
         return res.render("events/singleEvent",{event,user:req.user});
 
     }catch(error){

@@ -4,7 +4,8 @@ function setUser(user){
     return jwt.sign({
     _id:user._id,
     role:user.role,
-    email:user.email
+    email:user.email,
+    name:user.name,
     },process.env.JWT_SECRET)
 }
 

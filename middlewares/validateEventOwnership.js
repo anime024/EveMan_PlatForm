@@ -10,7 +10,7 @@ async function validate(req,res,next){
         }
 
         
-        if(event.createdBy.toString()!==req.user._id && req.user.role!=="admin"){
+        if(event.createdBy._id.toString()!==req.user._id && req.user.role!=="admin"){
             console.log(`${event.createdBy} and ${req.user._id}`)
             return res.redirect("/event/?msg=You Are Not allowed to manage the event")
         }

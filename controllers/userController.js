@@ -1,5 +1,10 @@
+const {User}=require("../models/user")
+
+
 function handleUserDashboard(req,res){
-    return res.render("dashboard",{message:null});
+    const user=req.user;
+    console.log(req.body);
+    return res.render("dashboard",{message:null,user:user});
 }
 
 function handleUserLogout(req,res){

@@ -67,7 +67,7 @@ async function handlePostLogin(req, res) {
             secure:false,
         })
       console.log(`user found ${user}`);
-      return res.render("dashboard", { message: user,token:token });
+      return res.render("dashboard", { message: null,token:token,user});
     } else {
       console.log("wrong password");
       return res.render("login", { message: "WRONG PASSWORD" });

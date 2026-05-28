@@ -9,17 +9,39 @@
 
     <p><%= event.description %></p>
 
+    <p>Creator: <%= event.createdBy.name %></p>
+
     <p>Category: <%= event.category %></p>
 
     <p>Visibility: <%= event.visibility %></p>
 
     <p>Date: <%= event.date.toDateString() %></p>
 
-    <% if( user.role==="admin" || event.createdBy.toString()===user._id){ %>
+    <% if( user.role==="admin" || event.createdBy._id.toString()===user._id){ %>
 
     <a href="/event/edit/<%= event._id %>">
+    <button type="button">
         Edit
+    </button>
+</a>
+
+    <h3>Upload Medias</h3>
+
+<div>
+
+    <a href="/upload/single">
+        <button type="button">
+            Upload Single Media
+        </button>
     </a>
+
+    <a href="/upload/multiple">
+        <button type="button">
+            Upload Multiple Medias
+        </button>
+    </a>
+
+</div>
 
     <form action="/event/delete/<%= event._id %>" method="POST">
 
