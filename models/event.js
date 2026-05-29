@@ -23,6 +23,10 @@ const EventSchema=new mongoose.Schema({
         type:String,
         default:"",
     },
+    media:{
+        type:[String],
+        default:[]
+    },
     coverImage:{
         type:String,
         default:""

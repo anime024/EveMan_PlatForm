@@ -11,10 +11,10 @@ const {
 const uploadRouter=express.Router();
 
 
-uploadRouter.get('/single',auth,handleGetSingleUpload);
-uploadRouter.post('/single',upload.single("media"),auth,handlePostSingleUpload);
-uploadRouter.get('/multiple',auth,handleGetMultipleUpload);
-uploadRouter.post('/multiple',upload.array("medias",12),auth,handlePostMultipleUpload);
+uploadRouter.get('/single/:id',auth,handleGetSingleUpload);
+uploadRouter.post('/single/:id',upload.single("media"),auth,handlePostSingleUpload);
+uploadRouter.get('/multiple/:id',auth,handleGetMultipleUpload);
+uploadRouter.post('/multiple/:id',upload.array("medias",12),auth,handlePostMultipleUpload);
 
 module.exports={uploadRouter};
 

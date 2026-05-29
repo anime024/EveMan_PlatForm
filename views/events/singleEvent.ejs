@@ -2,6 +2,44 @@
 <html lang="en">
 <head>
     <title>Single Event</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .gallery img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            transition: transform 0.2s;
+        }
+
+        .gallery img:hover {
+            transform: scale(1.03);
+        }
+
+        .media-title {
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 8px 12px;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+    </style>
+
 </head>
 <body>
 
@@ -17,41 +55,42 @@
 
     <p>Date: <%= event.date.toDateString() %></p>
 
-    <% if( user.role==="admin" || event.createdBy._id.toString()===user._id){ %>
+     <% if (user.role === "admin" || event.createdBy._id.toString() === user._id.toString()) { %>
 
-    <a href="/event/edit/<%= event._id %>">
-    <button type="button">
-        Edit
-    </button>
-</a>
+        <a href="/event/edit/<%= event._id %>">
+            <button type="button">Edit</button>
+        </a>
 
-    <h3>Upload Medias</h3>
+        <h3>Upload Medias</h3>
 
-<div>
+        <div>
+            <a href="/upload/single/<%= event._id %>">
+                <button type="button">Upload Single Media</button>
+            </a>
 
-    <a href="/upload/single">
-        <button type="button">
-            Upload Single Media
-        </button>
-    </a>
+            <a href="/upload/multiple/<%= event._id %>">
+                <button type="button">Upload Multiple Medias</button>
+            </a>
+        </div>
 
-    <a href="/upload/multiple">
-        <button type="button">
-            Upload Multiple Medias
-        </button>
-    </a>
+        <form action="/event/delete/<%= event._id %>" method="POST">
+            <button type="submit">Delete</button>
+        </form>
 
-</div>
+    <% } %>
 
-    <form action="/event/delete/<%= event._id %>" method="POST">
+    <h2 class="media-title">Event Media</h2>
 
-        <button type="submit">
-            Delete
-        </button>
+    <% if (event.media && event.media.length > 0) { %>
+        <div class="gallery">
+            <% event.media.forEach(function(url) { %>
+                <img src="<%= url %>" alt="event media">
+            <% }) %>
+        </div>
+    <% } else { %>
+        <p>No media uploaded yet.</p>
+    <% } %>
 
-    </form>
-
-<% } %>
 
 </body>
 </html>

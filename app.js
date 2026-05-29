@@ -26,6 +26,10 @@ app.use("/",(req,res)=>{
     res.render("homepage",{message:null});
 })
 
-app.listen(process.env.PORT,()=>{
+
+const PORT = process.env.PORT || 3000;
+
+
+app.listen(PORT,()=>{
     console.log(`Server statrted succesfuly at ${process.env.PORT}`);
 })
