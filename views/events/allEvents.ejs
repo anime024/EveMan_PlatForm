@@ -44,6 +44,19 @@
 
     <a href="/event/create">Create New Event</a>
 
+    <form action="/media/search" method="get">
+
+    <input
+        type="text"
+        name="q"
+        placeholder="Search events, users, tags" required>
+
+    <button>
+        Search
+    </button>
+
+</form>
+
     <hr>
 
     <% allEvents.forEach((event)=>{ %>

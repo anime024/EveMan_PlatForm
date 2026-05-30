@@ -60,7 +60,7 @@ async function handlePostCreateEvent(req, res) {
 
 async function handleGetSingleEvent(req, res) {
     try{
-        const event=await Event.findById(req.params.id).populate("createdBy","_id name");
+        const event=await Event.findById(req.params.id).populate("createdBy","_id name").populate("media","url _id");
         if(!event)
         {
             return res.send("Event not found");

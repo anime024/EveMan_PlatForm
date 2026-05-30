@@ -1,3 +1,4 @@
+const { Media } = require("../models/media");
 const {User}=require("../models/user")
 
 
@@ -17,4 +18,11 @@ function handlePhotoGrapher(req,res){
     return res.render("photographer",{message});
 }
 
-module.exports={handleUserDashboard,handleUserLogout,handlePhotoGrapher}
+async function handleGetFavourites(req,res){
+    const media=await Media.find({favourites:req.user._id});
+    console.log(`Favourites Media : ${media}`);
+    return res.render("favourites",{media});
+
+}
+
+module.exports={handleUserDashboard,handleUserLogout,handlePhotoGrapher,handleGetFavourites}

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Favourite Photos</title>
+    
+    <style>
+        :root {
+            --primary-color: #ff4757;
+            --background-color: #f1f2f6;
+            --card-color: #ffffff;
+            --text-color: #2f3542;
+            --text-muted: #747d8c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--text-color);
+            position: relative;
+            display: inline-block;
+        }
+
+        header h1::after {
+            content: ' ❤️';
+            font-size: 1.8rem;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .photo-card {
+            background-color: var(--card-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .photo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 75%; /* 4:3 Aspect Ratio */
+            background-color: #dfe4ea;
+            overflow: hidden;
+        }
+
+        .image-wrapper img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .photo-card:hover .image-wrapper img {
+            transform: scale(1.05);
+        }
+
+        .card-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+
+        .tag {
+            background-color: #f1f2f6;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            border-top: 1px solid #f1f2f6;
+            padding-top: 15px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .btn-view {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        .btn-view:hover {
+            background-color: #ff6b81;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background-color: var(--card-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .empty-state icon {
+            font-size: 4rem;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            margin-bottom: 25px;
+        }
+
+        .btn-browse {
+            display: inline-block;
+            background-color: var(--text-color);
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>My Favourite Photos</h1>
+            <p>A collection of your favorite captured moments</p>
+        </header>
+
+        <% if (media && media.length > 0) { %>
+            <div class="gallery-grid">
+                <% media.forEach(item => { %>
+                    <div class="photo-card">
+                        <div class="image-wrapper">
+                            <img src="<%= item.url %>" alt="Favourite Photo">
+                        </div>
+                        
+                        <div class="card-content">
+                            <% if (item.tags && item.tags.length > 0) { %>
+                                <div class="tag-container">
+                                    <% item.tags.forEach(tag => { %>
+                                        <span class="tag">#<%= tag %></span>
+                                    <% }) %>
+                                </div>
+                            <% } %>
+
+                            <div class="card-meta">
+                                <span>❤️ <%= item.likes ? item.likes.length : 0 %> Likes</span>
+                                <a href="/media/<%= item._id %>" class="btn-view">View Post</a>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% } else { %>
+            <div class="empty-state">
+                <span style="font-size: 4rem;">📸</span>
+                <h3>No favorites saved yet</h3>
+                <p>Explore the feed and tap the favorite button on photos you love!</p>
+                <a href="/media" class="btn-browse">Browse Media</a>
+            </div>
+        <% } %>
+    </div>
+
+</body>
+</html>

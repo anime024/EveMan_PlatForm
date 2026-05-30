@@ -9,6 +9,7 @@ const {authRouter}=require("./routes/authRoute")
 const {userRouter}=require("./routes/userRoute")
 const {eventRouter}=require("./routes/eventRoute")
 const {uploadRouter}=require("./routes/uploadRoutes")
+const {mediaRouter}=require('./routes/mediaRoutes')
 
 const app=express();
 
@@ -22,6 +23,7 @@ app.use("/",authRouter)
 app.use("/user",userRouter);
 app.use('/event',eventRouter)
 app.use('/upload',uploadRouter);
+app.use('/media',mediaRouter)
 app.use("/",(req,res)=>{
     res.render("homepage",{message:null});
 })

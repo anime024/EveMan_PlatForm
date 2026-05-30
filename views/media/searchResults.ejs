@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results for "<%= query %>"</title>
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-main: #212529;
+            --text-muted: #6c757d;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --border-color: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header Styling */
+        .search-header {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .search-header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .search-header span {
+            color: var(--primary);
+        }
+
+        .results-count {
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+            font-size: 0.95rem;
+        }
+
+        /* Grid Layout */
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Wrapper Link Styling to make whole card clickable without ruining text colors */
+        .card-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        /* Card Layout */
+        .media-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            height: 100%; /* Ensures all cards in a row match heights */
+        }
+
+        .card-link:hover .media-card {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-color: #cbd5e1;
+        }
+
+        /* Dynamic Preview Window */
+        .media-preview {
+            width: 100%;
+            height: 200px;
+            background-color: #e5e7eb;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .media-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .media-preview video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+            background: #000;  
+        }
+
+        .file-icon {
+            font-size: 3rem;
+            color: var(--text-muted);
+        }
+
+        /* Card Body Content */
+        .media-body {
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .media-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .meta-item {
+            background: #f3f4f6;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .media-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+        }
+
+        /* Tag Section */
+        .media-tags {
+            margin-top: auto;
+            padding-top: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+        }
+
+        .tag {
+            font-size: 0.75rem;
+            background: #f3f4f6;
+            color: #4b5563;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .tag.highlight {
+            background-color: #fef3c7;
+            color: #d97706;
+            border-color: #fcd34d;
+            font-weight: bold;
+        }
+
+        /* Empty State */
+        .no-results {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .no-results h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .no-results p {
+            color: var(--text-muted);
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 1.5rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .back-btn:hover {
+            background-color: var(--primary-hover);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="search-header">
+            <h1>Search Results for: <span>"<%= query %>"</span></h1>
+            <p class="results-count">Found <%= media.length %> item(s)</p>
+        </header>
+
+        <% if (media && media.length > 0) { %>
+            <main class="media-grid">
+                <% media.forEach(item => { %>
+                    
+                    <a href="/media/<%=item._id %> " class="card-link">
+                        
+                        <article class="media-card">
+                            
+                            <div class="media-preview">
+                                <% if (item.url) { %>
+                                    <% if (item.url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) { %>
+                                        <img src="<%= item.url %>" alt="<%= (item.event && item.event.title) ? item.event.title : 'Media file' %>" loading="lazy">
+                                    <% } else if (item.url.match(/\.(mp4|webm|ogg|mov)$/i)) { %>
+                                        <video src="<%= item.url %>" controls muted playsinline></video>
+                                    <% } else { %>
+                                        <div class="file-icon">📁</div>
+                                    <% } %>
+                                <% } else { %>
+                                    <div class="file-icon">❌</div>
+                                <% } %>
+                            </div>
+
+                            <div class="media-body">
+                                <div class="media-meta">
+                                    <% if (item.uploadedBy) { %>
+                                        <span class="meta-item">By: <%= item.uploadedBy.name %></span>
+                                    <% } %>
+                                </div>
+
+                                <h2 class="media-title">
+                                    <% if (item.event && item.event.title) { %>
+                                        📅 Event: <%= item.event.title %>
+                                    <% } else { %>
+                                        📦 General Media Asset
+                                    <% } %>
+                                </h2>
+
+                                <% if (item.tags && item.tags.length > 0) { %>
+                                    <div class="media-tags">
+                                        <% item.tags.forEach(tag => { %>
+                                            <span class="tag <%= tag.toLowerCase() === query.toLowerCase() ? 'highlight' : '' %>">
+                                                #<%= tag %>
+                                            </span>
+                                        <% }) %>
+                                    </div>
+                                <% } %>
+                            </div>
+
+                        </article>
+                    </a>
+                <% }) %>
+            </main>
+        <% } else { %>
+            <section class="no-results">
+                <h3>No Media Found</h3>
+                <p>We couldn't find anything matching "<%= query %>". Try checking your spelling or looking up a different keyword.</p>
+                <a href="javascript:history.back()" class="back-btn">Go Back</a>
+            </section>
+        <% } %>
+
+    </div>
+
+</body>
+</html>

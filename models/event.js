@@ -1,6 +1,7 @@
 const mongoose=require("mongoose")
 
 const {User}=require("./user")
+const {Media}=require('./media')
 
 const EventSchema=new mongoose.Schema({
     title:{
@@ -24,8 +25,10 @@ const EventSchema=new mongoose.Schema({
         default:"",
     },
     media:{
-        type:[String],
-        default:[]
+        type:[{
+            type:mongoose.Types.ObjectId,
+            ref:"Media",
+        }]
     },
     coverImage:{
         type:String,

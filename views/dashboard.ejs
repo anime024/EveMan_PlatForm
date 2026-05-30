@@ -61,6 +61,9 @@
 
         .photo-btn{ background:#3498db; }
         .photo-btn:hover{ background:#2c80b4; }
+        
+        .favourite-btn{ background:#dfe62c; }
+        .favourite-btn:hover{ background:#bae52c; }
 
         .event-link{
             display:inline-block;
@@ -100,6 +103,11 @@
 
         <br><br>
 
+        <a href="/user/favourites">
+            <button class="btn favourite-btn" type="submit">
+                My Favourites
+            </button>
+        </a>
         <form action="/user/logout" method="get">
             <button class="btn logout-btn" type="submit">
                 Logout

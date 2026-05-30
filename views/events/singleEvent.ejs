@@ -9,28 +9,64 @@
             margin: 20px;
         }
 
+        /* --- MODERNIZED GALLERY CSS --- */
         .gallery {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 15px;
+            /* Creates a responsive grid that autofills based on content width */
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
             margin-top: 20px;
         }
 
-        .gallery img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            transition: transform 0.2s;
+        .gallery-item {
+            display: block;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background-color: #f9f9f9;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            height: 250px; /* Force uniform container height for everything */
         }
 
-        .gallery img:hover {
-            transform: scale(1.03);
+        /* Shared dimensions for images and videos */
+        .gallery-item img, 
+        .gallery-item video {
+            width: 100%;
+            height: 100%; 
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Hover zoom effect only targets images and non-playing video previews */
+        .gallery-item:hover img {
+            transform: scale(1.06); /* Smoothly zooms inside the container */
+        }
+
+        /* Optional: Add a subtle play icon overlay on videos so users know they can click it */
+        .video-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 2;
         }
 
         .media-title {
-            margin-top: 30px;
+            margin-top: 40px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 8px;
         }
 
         button {
@@ -38,6 +74,7 @@
             margin: 5px 0;
             cursor: pointer;
         }
+        
     </style>
 
 </head>
@@ -82,15 +119,28 @@
     <h2 class="media-title">Event Media</h2>
 
     <% if (event.media && event.media.length > 0) { %>
-        <div class="gallery">
-            <% event.media.forEach(function(url) { %>
-                <img src="<%= url %>" alt="event media">
-            <% }) %>
-        </div>
-    <% } else { %>
-        <p>No media uploaded yet.</p>
-    <% } %>
+    <div class="gallery">
+        <% event.media.forEach(function(item) { %>
+            <% if (item.url) { %>
+                <% 
+                    const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov'];
+                    const isVideo = videoExtensions.some(ext => item.url.toLowerCase().endsWith(ext));
+                %>
 
+                <a href="/media/<%= item._id %>" class="gallery-item">
+                    <% if (isVideo) { %>
+                        <div class="video-badge">▶ Video</div>
+                        <video src="<%= item.url %>" preload="metadata" muted></video>
+                    <% } else { %>
+                        <img src="<%= item.url %>" alt="event media">
+                    <% } %>
+                </a>
+            <% } %>
+        <% }) %>
+    </div>
+<% } else { %>
+    <p>No media uploaded yet.</p>
+<% } %>
 
 </body>
 </html>

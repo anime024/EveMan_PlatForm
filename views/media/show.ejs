@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px auto;
+            max-width: 800px;
+            padding: 0 20px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Back Button Style */
+        .back-nav {
+            margin-bottom: 20px;
+        }
+        .back-link {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Main Image Styling from your original structure */
+        .main-media {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        /* --- DOWNLOAD BUTTON STYLE --- */
+        .download-container {
+            margin: -10px 0 20px 0; /* Pulls slightly closer to the media asset */
+        }
+        .download-btn {
+            display: inline-block;
+            background-color: #28a745; /* Clean standard green */
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.2s ease;
+        }
+        .download-btn:hover {
+            background-color: #218838; /* Darker green on hover */
+        }
+
+        /* Quick Interaction Grid (Likes & Favorites) */
+        .interaction-panel {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .action-button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            background: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+        .action-button:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.02);
+        }
+
+        /* Tags List Layout */
+        .tags-container {
+            margin: 15px 0;
+        }
+        .tag-badge {
+            display: inline-block;
+            background: #e9ecef;
+            color: #495057;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+
+        /* Comment System Styling */
+        .comments-section {
+            margin-top: 40px;
+            border-top: 2px solid #eee;
+            padding-top: 20px;
+        }
+        .comment-input {
+            width: 100%;
+            height: 70px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            resize: none;
+            box-sizing: border-box;
+        }
+        .comment-submit-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .comment-submit-btn:hover {
+            background: #0056b3;
+        }
+        .comment-card {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 12px;
+            border-left: 4px solid #007bff;
+        }
+        .comment-author {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .comment-date {
+            font-size: 12px;
+            color: #777;
+            margin-left: 8px;
+        }
+        .comment-text {
+            margin: 5px 0 0 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="back-nav">
+        <% if (media.event) { %>
+            <a href="/event/<%= media.event._id %>" class="back-link">← Back to <%= media.event.title %> Gallery</a>
+        <% } else { %>
+            <a href="/events" class="back-link">← Back to All Events</a>
+        <% } %>
+    </div>
+
+    <h1>Media Details</h1>
+
+    <% 
+        const cleanUrl = media.url.split('?')[0]; 
+        const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov'];
+        const isVideo = videoExtensions.some(ext => cleanUrl.toLowerCase().endsWith(ext));
+    %>
+
+    <% if (isVideo) { %>
+        <video src="<%= media.url %>" class="main-media" controls preload="auto" style="width: 700px; max-width: 100%;"></video>
+    <% } else { %>
+        <img src="<%= media.url %>" width="700" class="main-media" alt="Event Asset">
+    <% } %>
+
+    <div class="download-container">
+        <a href="<%= media.url %>" class="download-btn" download target="_blank">
+            Download
+        </a>
+    </div>
+
+    <p>
+        <strong>Uploaded By:</strong> 
+        <%= media.uploadedBy ? media.uploadedBy.name : "Unknown User" %>
+    </p>
+
+    <p>
+        <strong>Event:</strong> 
+        <%= media.event ? media.event.title : "Independent Direct Upload" %>
+    </p>
+
+    <div class="interaction-panel">
+        <form action="/media/<%= media._id %>/like" method="POST" style="display:inline;">
+            <button type="submit" class="action-button">
+                ❤️ <%= media.likes ? media.likes.length : 0 %> Likes
+            </button>
+        </form>
+
+        <form action="/media/<%= media._id %>/favourite" method="POST" style="display:inline;">
+            <button type="submit" class="action-button">
+                ⭐ <%= media.favourites ? media.favourites.length : 0 %> Favorites
+            </button>
+        </form>
+    </div>
+
+    <% if (media.tags && media.tags.length > 0) { %>
+        <div class="tags-container">
+            <strong>Tags:</strong>
+            <% media.tags.forEach(function(tag) { %>
+                <span class="tag-badge">#<%= tag %></span>
+            <% }) %>
+        </div>
+    <% } %>
+
+    <div class="comments-section">
+        <h3>Comments (<%= media.comments ? media.comments.length : 0 %>)</h3>
+
+        <form action="/media/<%= media._id %>/comment" method="POST">
+            <textarea name="text" class="comment-input" placeholder="Add your comments here ..." required></textarea>
+            <button type="submit" class="comment-submit-btn">Add Comment</button>
+        </form>
+
+        <div style="margin-top: 20px;">
+            <% if (media.comments && media.comments.length > 0) { %>
+                <% media.comments.forEach(function(comment) { %>
+                    <div class="comment-card">
+                        <div>
+                            <span class="comment-author"><%= comment.user ? comment.user.name : "Anonymous" %></span>
+                            <span class="comment-date"><%= new Date(comment.createdAt).toLocaleDateString() %></span>
+                        </div>
+                        <p class="comment-text"><%= comment.text %></p>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p style="color: #666; font-style: italic; margin-top: 15px;">No comments yet. Write the first one!</p>
+            <% } %>
+        </div>
+    </div>
+
+</body>
+</html>
