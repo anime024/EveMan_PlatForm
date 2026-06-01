@@ -89,15 +89,33 @@ async function handlePostMultipleUpload(req, res) {
     }
 
     const {tags}=req.body;
-    const  parsedTags=tags?tags.split(","):[];
 
-    const mediaCreationPromises=req.files.map((file)=>{
+    const mediaCreationPromises=req.files.map(async (file)=>{
+      let tags=[];
       const mediaLocation=file.location;
+
+      if(file.mimetype.startsWith('image/'))
+      {
+        const response=await rekognitionClient.send(
+          new DetectLabelsCommand({
+            Image:{
+              S3Object:{
+                Bucket:process.env.AWS_BUCKET_NAME,
+              Name:file.key
+              }
+            },
+            MaxLabels:10
+          })
+        )
+
+        tags=response.Labels.map(label=> label.Name)
+      }
+
       return Media.create({
         event:req.params.id,
         uploadedBy:user._id,
         url:mediaLocation,
-        tags:parsedTags
+        tags
       })
     })
 
