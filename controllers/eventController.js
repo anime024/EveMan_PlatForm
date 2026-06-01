@@ -30,7 +30,7 @@ async function handleGetAllEvents(req, res) {
 
         const allEvents=await Event.find(filter).sort(sortOption).populate("createdBy","_id name");
         const message=req.query.msg||null;
-        return res.render("events/allEvents",{allEvents,message})
+        return res.render("events/allEvents",{allEvents,message,user:req.user})
     }catch(error){
         console.log(`Error during getallEvents ${error}`);
         return res.send("ERROR CREATING EVENT ")

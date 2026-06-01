@@ -7,6 +7,6 @@ const userRouter=express.Router();
 userRouter.get("/dashboard",auth,handleUserDashboard)
 userRouter.get("/logout",auth,handleUserLogout)
 userRouter.get("/photographer",auth,checkRole("photographer"),handlePhotoGrapher)
-userRouter.get("/favourites",auth,checkRole("photographer"),handleGetFavourites)
+userRouter.get("/favourites",auth,handleGetFavourites)
 
 module.exports={userRouter}

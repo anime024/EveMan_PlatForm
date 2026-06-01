@@ -1,0 +1,250 @@
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+.navbar {
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-container {
+    max-width: 1200px;
+    margin: auto;
+    height: 70px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.navbar-brand {
+    text-decoration: none;
+    color: #4f46e5;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.navbar-links {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.navbar-links a {
+    text-decoration: none;
+    color: #374151;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: .2s;
+    display: inline-block;
+}
+
+.navbar-links a:hover {
+    background: #f3f4f6;
+}
+
+/* Base button states with clean override hierarchy */
+.navbar-links .btn-accent {
+    background: #4f46e5;
+    color: white;
+}
+
+.navbar-links .btn-accent:hover {
+    background: #4338ca;
+}
+
+.navbar-links .btn-notification {
+    background: #ecdc31;
+    color: #111827; /* Dark text for better contrast against yellow */
+    display: block;
+    text-align: center;
+    margin: 8px;
+}
+
+.navbar-links .btn-notification:hover {
+    background: #f8852e;
+    color: white;
+}
+
+.navbar-links .btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.navbar-links .btn-danger:hover {
+    background: #dc2626;
+}
+
+/* Dropdown styling updates */
+.dropdown {
+    position: relative;
+}
+
+.notification-dropdown {
+    position: absolute;
+    top: 45px;
+    right: 0;
+    width: 350px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.12);
+    display: none;
+    overflow: hidden;
+    z-index: 1000;
+}
+
+.notification-dropdown.show {
+    display: block;
+}
+
+.notification-header {
+    padding: 12px;
+    font-weight: 600;
+    border-bottom: 1px solid #e5e7eb;
+    color: #111827;
+}
+
+.notification-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.notification-list li {
+    padding: 12px;
+    border-bottom: 1px solid #f3f4f6;
+    color: #374151;
+}
+
+.notification-list li:hover {
+    background: #f9fafb;
+}
+
+.navbar-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+/* Responsive Overrides */
+@media(max-width: 768px) {
+    .navbar-toggle {
+        display: block;
+    }
+
+    .navbar-links {
+        display: none;
+        flex-direction: column;
+        align-items: stretch; /* Stretches buttons evenly for uniform mobile layout */
+        gap: 12px;
+        position: absolute;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        background: white;
+        padding: 20px;
+        border-bottom: 1px solid #e5e7eb;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .navbar-links.active {
+        display: flex;
+    }
+    
+    .navbar-links a {
+        width: 100%;
+        text-align: center;
+    }
+
+    .notification-dropdown {
+        position: static; /* Allows it to stack natively inside the mobile tray */
+        width: 100%;
+        box-shadow: none;
+        border: 1px solid #e5e7eb;
+        margin-top: 5px;
+    }
+}
+</style>
+
+<nav class="navbar">
+    <div class="navbar-container">
+        <a href="/" class="navbar-brand">🎉 EventHub</a>
+
+        <button class="navbar-toggle" onclick="toggleMenu()" aria-label="Toggle navigation">
+            ☰
+        </button>
+
+        <ul class="navbar-links" id="navbarLinks">
+            <li><a href="/">Home</a></li>
+            <li><a href="/event">All Events</a></li>
+
+            <% if(user){ %>
+                <li><a href="/user/dashboard">Dashboard</a></li>
+                <li><a href="/user/favourites">Favourites</a></li>
+
+                <li class="dropdown">
+                    <a href="#" onclick="toggleNotifications(event)">
+                        Notifications <span id="notificationCount"></span>
+                    </a>
+                    <div id="notificationDropdown" class="notification-dropdown">
+                        <div class="notification-header">
+                            Notifications
+                        </div>
+                        <ul id="notificationList" class="notification-list">
+                            </ul>
+                        <div class="notification-footer">
+                            <a href="/notification" class="btn-notification">
+                                See All Unread Notifications
+                            </a>
+                        </div>
+                    </div>
+                </li>
+
+                <li><a href="/user/logout" class="btn-danger">Logout</a></li>
+            <% } else { %>
+                <li><a href="/login">Login</a></li>
+                <li><a href="/signup" class="btn-accent">Sign Up</a></li>
+            <% } %>
+        </ul>
+    </div>
+</nav>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    window.currentUserId = "<%= user ? user._id : '' %>";
+
+    function toggleMenu() {
+        document.getElementById("navbarLinks").classList.toggle("active");
+    }
+
+    function toggleNotifications(event) {
+        if (event) event.preventDefault();
+        document.getElementById("notificationDropdown").classList.toggle("show");
+    }
+
+    // Single global listener to catch clicks away from dropdown menu
+    document.addEventListener("click", (e) => {
+        const dropdown = document.querySelector(".dropdown");
+        if (dropdown && !dropdown.contains(e.target)) {
+            document.getElementById("notificationDropdown")?.classList.remove("show");
+        }
+    }); 
+</script>
+<script src="/js/socket.js"></script>

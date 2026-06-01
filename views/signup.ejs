@@ -6,58 +6,131 @@
   <title>Signup Form</title>
 
   <style>
+    /* Global resets to keep partial layouts predictable */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, sans-serif;
+      background-color: #f0fdf4; /* Very light mint/green tint */
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column; /* Stacks navbar on top, container below */
+    }
+
+    /* Isolated container preventing body flex from breaking elements */
+    .form-container {
+      flex: 1;
       display: flex;
       justify-content: center;
-      margin-top: 100px;
+      align-items: center; /* Vertically centers the form on the remaining page space */
+      padding: 40px 20px;
+    }
+
+    .signup-card {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(4, 120, 87, 0.08); /* Soft green-tinted shadow */
+      width: 100%;
+      max-width: 380px; /* Slightly wider to easily accommodate inputs and dropdown text */
     }
 
     .signup-form {
       display: flex;
       flex-direction: column;
-      width: 250px;
-      gap: 10px;
+      gap: 15px;
     }
 
-    input,
-    button,
-    select {
+    .signup-form h2 {
+      color: #064e3b; /* Deep forest green */
+      margin-bottom: 5px;
+      text-align: center;
+    }
+
+    .alert-message {
+      font-size: 0.9rem;
+      color: #dc2626; /* Warning red */
+      background: #fee2e2;
       padding: 10px;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: 500;
     }
 
-    button {
-      background-color: green;
+    .signup-form input,
+    .signup-form select,
+    .signup-form button {
+      padding: 12px;
+      font-size: 1rem;
+      border-radius: 6px;
+      outline: none;
+      width: 100%;
+    }
+
+    .signup-form input,
+    .signup-form select {
+      border: 1px solid #cbd5e1; /* Smooth slate border */
+      background-color: #fff;
+      color: #334155;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    /* Focus ring using the new emerald theme color */
+    .signup-form input:focus,
+    .signup-form select:focus {
+      border-color: #059669;
+      box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+    }
+
+    .signup-form button {
+      background-color: #059669; /* Emerald Green */
       color: white;
       border: none;
       cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+      margin-top: 5px;
+    }
+
+    .signup-form button:hover {
+      background-color: #047857; /* Darker Emerald on hover */
     }
   </style>
 </head>
 <body>
 
-  <form action="/signup" class="signup-form" method="post" >
-    <h2>Signup</h2>
+  <%- include('partials/navbar') %>
 
-    <% if (message) { %>
-     <h3><%= message %></h3>
-    <% } %>
+  <div class="form-container">
+    <div class="signup-card">
+      <form action="/signup" class="signup-form" method="post">
+        <h2>Create Account</h2>
 
-    
-    <input type="text" name="name" placeholder="Enter Name" required>
+        <% if (message) { %>
+          <div class="alert-message"><%= message %></div>
+        <% } %>
 
-    <input type="email"  name="email" placeholder="Enter Email" required>
+        <input type="text" name="name" placeholder="Enter Name" required>
 
-<select name="role" required>
-  <option value="">Select Role</option>
-  <option value="photographer">Photographer</option>
-  <option value="member">Member</option>
-  <option value="viewer">Viewer</option>
-</select>
-    <input type="password" name="password" placeholder="Enter Password" required>
+        <input type="email" name="email" placeholder="Enter Email" required>
 
-    <button type="submit">Signup</button>
-  </form>
+        <select name="role" required>
+          <option value="" disabled selected>Select your role</option>
+          <option value="photographer">Photographer</option>
+          <option value="member">Member</option>
+          <option value="viewer">Viewer</option>
+        </select>
+
+        <input type="password" name="password" placeholder="Enter Password" required>
+
+        <button type="submit">Sign Up</button>
+      </form>
+    </div>
+  </div>
 
 </body>
 </html>

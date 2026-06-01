@@ -6,47 +6,114 @@
   <title>Login Form</title>
 
   <style>
+    /* 1. Global resets to ensure consistency across partials */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, sans-serif;
+      background-color: #f9fafb; /* Light background for better contrast */
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column; /* Stack navbar on top, container below */
+    }
+
+    /* 2. Form wrapper container to isolate layout logic from body flex */
+    .form-container {
+      flex: 1;
       display: flex;
       justify-content: center;
-      margin-top: 100px;
+      align-items: center; /* Vertically centers the form on the remaining screen */
+      padding: 20px;
+    }
+
+    .login-card {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      width: 100%;
+      max-width: 350px; /* Marginally wider for a cleaner layout */
     }
 
     .login-form {
       display: flex;
       flex-direction: column;
-      width: 250px;
-      gap: 10px;
+      gap: 15px; /* Slightly uniform gap spacing */
     }
 
-    input,
-    button {
-      padding: 10px;
+    .login-form h2 {
+      color: #111827;
+      margin-bottom: 5px;
+      text-align: center;
     }
 
-    button {
-      background-color: blue;
+    .alert-message {
+      font-size: 0.9rem;
+      color: #ef4444;
+      background: #fee2e2;
+      padding: 8px;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .login-form input,
+    .login-form button {
+      padding: 12px;
+      font-size: 1rem;
+      border-radius: 6px;
+      outline: none;
+    }
+
+    .login-form input {
+      border: 1px solid #d1d5db;
+      transition: border-color 0.2s;
+    }
+
+    .login-form input:focus {
+      border-color: #4f46e5; /* Matches your navbar purple branding */
+    }
+
+    .login-form button {
+      background-color: #4f46e5; /* Consistent brand color */
       color: white;
       border: none;
       cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+      margin-top: 5px;
+    }
+
+    .login-form button:hover {
+      background-color: #4338ca;
     }
   </style>
 </head>
 <body>
 
-  <form class="login-form" method="post" action="/login">
-    <h2>Login</h2>
-    <% if (message) { %>
-     <h3><%= message %></h3>
-    <% } %>
+  <%- include('partials/navbar') %>
 
-    <input type="email" name="email" placeholder="Enter Email" required>
+  <div class="form-container">
+    <div class="login-card">
+      <form class="login-form" method="post" action="/login">
+        <h2>Login</h2>
+        
+        <% if (message) { %>
+          <div class="alert-message"><%= message %></div>
+        <% } %>
 
-    <input type="password" name="password" placeholder="Enter Password" required>
+        <input type="email" name="email" placeholder="Enter Email" required>
 
-    <button type="submit">Login</button>
-  </form>
+        <input type="password" name="password" placeholder="Enter Password" required>
+
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  </div>
 
 </body>
 </html>

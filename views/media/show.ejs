@@ -143,11 +143,14 @@
 </head>
 <body>
 
+        <%- include('../partials/navbar') %>
+
+
     <div class="back-nav">
         <% if (media.event) { %>
             <a href="/event/<%= media.event._id %>" class="back-link">← Back to <%= media.event.title %> Gallery</a>
         <% } else { %>
-            <a href="/events" class="back-link">← Back to All Events</a>
+            <a href="/event" class="back-link">← Back to All Events</a>
         <% } %>
     </div>
 
@@ -182,18 +185,17 @@
     </p>
 
     <div class="interaction-panel">
-        <form action="/media/<%= media._id %>/like" method="POST" style="display:inline;">
-            <button type="submit" class="action-button">
-                ❤️ <%= media.likes ? media.likes.length : 0 %> Likes
-            </button>
-        </form>
+    <button type="button" class="action-button" id="likeBtn" onclick="likeMedia('<%= media._id %>')">
+        ❤️ <span id="likeCount"><%= media.likes ? media.likes.length : 0 %></span> Likes
+    </button>
 
-        <form action="/media/<%= media._id %>/favourite" method="POST" style="display:inline;">
-            <button type="submit" class="action-button">
-                ⭐ <%= media.favourites ? media.favourites.length : 0 %> Favorites
-            </button>
-        </form>
-    </div>
+    <button type="button"
+        class="action-button"
+        id="favBtn"
+        onclick="favouriteMedia('<%= media._id %>')">
+    ⭐ <span id="favCount"><%= media.favourites ? media.favourites.length : 0 %></span> Favorites
+</button>
+</div>
 
     <% if (media.tags && media.tags.length > 0) { %>
         <div class="tags-container">
@@ -205,14 +207,30 @@
     <% } %>
 
     <div class="comments-section">
-        <h3>Comments (<%= media.comments ? media.comments.length : 0 %>)</h3>
+        <h3>
+    Comments (
+    <span id="commentCount">
+        <%= media.comments ? media.comments.length : 0 %>
+    </span>
+    )
+</h3>
+        <div>
+    <textarea
+        id="commentText"
+        class="comment-input"
+        placeholder="Add your comments here ..."
+        required>
+    </textarea>
 
-        <form action="/media/<%= media._id %>/comment" method="POST">
-            <textarea name="text" class="comment-input" placeholder="Add your comments here ..." required></textarea>
-            <button type="submit" class="comment-submit-btn">Add Comment</button>
-        </form>
+    <button
+        type="button"
+        class="comment-submit-btn"
+        onclick="addComment('<%= media._id %>')">
+        Add Comment
+    </button>
+</div>
 
-        <div style="margin-top: 20px;">
+        <div  id="commentsContainer" style="margin-top: 20px;">
             <% if (media.comments && media.comments.length > 0) { %>
                 <% media.comments.forEach(function(comment) { %>
                     <div class="comment-card">
@@ -229,5 +247,134 @@
         </div>
     </div>
 
+    <script>
+
+        console.log("SCRIPT LOADED");
+
+        async function addComment(mediaId) {
+    console.log("ADD COMMENT CLICKED");
+        }
+async function likeMedia(mediaId) {
+    try {
+        const response = await fetch(`/media/${mediaId}/like`, { 
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            // Parse the JSON object sent by your backend controller
+            const data = await response.json(); 
+            
+            // Find the span tag and update the number dynamically!
+            document.getElementById('likeCount').innerText = data.likesCount;
+            
+            console.log("✅ Background like recorded. Total likes now:", data.likesCount);
+        } else {
+            console.error("Backend returned an error status:", response.status);
+        }
+    } catch (err) {
+        console.error("Failed to execute background fetch:", err);
+    }
+}
+
+async function favouriteMedia(mediaId) {
+    try {
+        const response = await fetch(`/media/${mediaId}/favourite`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+
+            document.getElementById('favCount').innerText =
+                data.favouritesCount;
+
+            console.log(
+                "⭐ Favourite updated. Total favourites:",
+                data.favouritesCount
+            );
+        } else {
+            console.error(
+                "Backend returned an error status:",
+                response.status
+            );
+        }
+    } catch (err) {
+        console.error("Failed to execute background fetch:", err);
+    }
+}
+
+async function addComment(mediaId) {
+
+    const text = document
+        .getElementById("commentText")
+        .value
+        .trim();
+
+    if (!text) return;
+
+    try {
+
+        const response = await fetch(
+            `/media/${mediaId}/comment`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({ text })
+            }
+        );
+
+        if (!response.ok) {
+            console.error("Comment failed");
+            return;
+        }
+
+        const data = await response.json();
+
+        document.getElementById("commentText").value = "";
+
+        document.getElementById("commentCount").innerText =
+            data.commentsCount;
+
+        const commentsContainer =
+            document.getElementById("commentsContainer");
+
+        commentsContainer.insertAdjacentHTML(
+            "afterbegin",
+            `
+            <div class="comment-card">
+                <div>
+                    <span class="comment-author">
+                        ${data.userName}
+                    </span>
+
+                    <span class="comment-date">
+                        Just now
+                    </span>
+                </div>
+
+                <p class="comment-text">
+                    ${data.commentText}
+                </p>
+            </div>
+            `
+        );
+
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+</script>
 </body>
 </html>

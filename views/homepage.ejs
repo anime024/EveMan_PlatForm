@@ -1,72 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HomePage</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EventHub | Discover & Share Events</title>
 
-    <style>
-        body{
-            font-family: Arial, sans-serif;
-            background: #f4f4f4;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
+  <style>
+    /* Global resets to keep layout consistent with the navbar */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        h1{
-            margin-top: 60px;
-            color: #333;
-        }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f9fafb; /* Soft light gray matching your forms */
+      color: #1f2937;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
-        h2{
-            color: #e63946;
-        }
+    /* Message banner styling (if passed from backend routing) */
+    .alert-banner {
+      background: #fee2e2;
+      color: #dc2626;
+      padding: 12px;
+      text-align: center;
+      font-weight: 500;
+      border-bottom: 1px solid #fca5a5;
+    }
 
-        .btn-container{
-            margin-top: 30px;
-        }
+    /* Hero Layout Section */
+    .hero-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
 
-        .btn{
-            display: inline-block;
-            padding: 10px 18px;
-            margin: 10px;
-            text-decoration: none;
-            color: white;
-            background: #007bff;
-            border-radius: 6px;
-            font-size: 16px;
-            transition: 0.2s;
-        }
+    .hero-content {
+      max-width: 700px;
+      text-align: center;
+    }
 
-        .btn:hover{
-            background: #0056b3;
-        }
+    .hero-badge {
+      display: inline-block;
+      background: #eeebff;
+      color: #4f46e5; /* Matches navbar brand */
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
 
-        .signup{
-            background: #28a745;
-        }
+    .hero-content h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1.15;
+      color: #111827;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
 
-        .signup:hover{
-            background: #1e7e34;
-        }
+    /* Highlighting part of text with brand purple */
+    .hero-content h1 span {
+      color: #4f46e5;
+    }
 
-       
-    </style>
+    .hero-content p {
+      font-size: 1.2rem;
+      color: #4b5563;
+      line-height: 1.6;
+      margin-bottom: 35px;
+    }
+
+    /* Call To Action Buttons */
+    .cta-container {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 28px;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: all 0.2s ease-in-out;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Main Action Button - Indigo Theme */
+    .btn-primary {
+      background: #4f46e5;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #4338ca;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.2);
+    }
+
+    /* Secondary Action Button - Emerald Theme */
+    .btn-secondary {
+      background: #059669;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #047857;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 15px -3px rgba(5, 150, 105, 0.2);
+    }
+
+    /* Responsive scaling for mobile devices */
+    @media (max-width: 640px) {
+      .hero-content h1 {
+        font-size: 2.2rem;
+      }
+      .hero-content p {
+        font-size: 1rem;
+      }
+      .cta-container {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .btn {
+        text-align: center;
+      }
+    }
+  </style>
 </head>
-
 <body>
 
-    <h1>HOMEPAGE</h1>
+  <%- include('partials/navbar') %>
 
-    <% if (message) { %>
-        <h2><%= message %></h2>
-    <% } %>
-
-    <div class="btn-container">
-        <a href="/login" class="btn">LOGIN</a>
-        <a href="/signup" class="btn signup">SIGNUP</a>
+  <% if (message) { %>
+    <div class="alert-banner">
+      <%= message %>
     </div>
+  <% } %>
+
+  <main class="hero-container">
+    <div class="hero-content">
+      <span class="hero-badge">Welcome to EventHub</span>
+      
+      <h1>Discover & Share <span>Unforgettable</span> Events</h1>
+      
+      <p>
+        Connect with talented photographers, join amazing local meetups, and never 
+        miss out on what's happening around you. Create your free profile today.
+      </p>
+
+      <div class="cta-container">
+        <a href="/login" class="btn btn-primary">Login to Account</a>
+        <a href="/signup" class="btn btn-secondary">Create Account</a>
+      </div>
+    </div>
+  </main>
 
 </body>
 </html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications</title>
+
+    <style>
+
+        body{
+            max-width:900px;
+            margin:30px auto;
+            font-family:Arial,sans-serif;
+            padding:0 20px;
+        }
+
+        .notification-card{
+
+            border:1px solid #ddd;
+            border-radius:8px;
+
+            padding:15px;
+            margin-bottom:12px;
+
+            background:#fafafa;
+        }
+
+        .notification-message{
+
+            font-size:16px;
+            margin-bottom:5px;
+        }
+
+        .notification-date{
+
+            color:#777;
+            font-size:13px;
+        }
+
+        .empty{
+
+            text-align:center;
+            color:#666;
+            margin-top:40px;
+        }
+
+    </style>
+
+</head>
+<body>
+
+    <%- include('../partials/navbar') %>
+
+    <h1>Notifications</h1>
+
+    <% if(notifications.length === 0){ %>
+
+        <p class="empty">
+            No notifications yet.
+        </p>
+
+    <% } else { %>
+
+        <% notifications.forEach(notification => { %>
+
+            <div class="notification-card">
+
+                <div class="notification-message">
+                    <%= notification.message %>
+                </div>
+
+                <div class="notification-date">
+                    <%= notification.createdAt.toLocaleString() %>
+                </div>
+
+            </div>
+
+        <% }) %>
+
+    <% } %>
+
+</body>
+</html>

@@ -15,10 +15,18 @@
 
         body{
             background-color:#f4f4f4;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            height:100vh;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column; /* Allows navbar at top and content below */
+        }
+
+        /* NEW CONTAINER: This handles centering your dashboard card below the navbar */
+        .main-container {
+            flex: 1; /* Fills remaining height */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
 
         .dashboard{
@@ -62,7 +70,7 @@
         .photo-btn{ background:#3498db; }
         .photo-btn:hover{ background:#2c80b4; }
         
-        .favourite-btn{ background:#dfe62c; }
+        .favourite-btn{ background:#dfe62c; color: #333; font-weight: bold; } /* Slightly darkened text for visibility */
         .favourite-btn:hover{ background:#bae52c; }
 
         .event-link{
@@ -80,41 +88,54 @@
 </head>
 
 <body>
+    <%- include('partials/navbar') %>
 
-    <div class="dashboard">
+    <div class="main-container">
+        <div class="dashboard">
 
-        <% if (message) { %>
-            <h2><%= message %></h2>
-        <% } %>
+            <% if (message) { %>
+                <h2><%= message %></h2>
+            <% } %>
 
-        <h1>Dashboard</h1>
+            <h1>Dashboard</h1>
 
-        <p>Welcome <%= user.name %></p>
-        <p>Email: <%= user.email %></p>
-        
-        <p>Role: <%= user.role %></p>
-        <form action="/user/photographer" method="get">
-            <button class="btn photo-btn" type="submit">
-                Photographer Only Link
-            </button>
-        </form>
+            <p>Welcome <%= user.name %></p>
+            <p>Email: <%= user.email %></p>
+            <p>Role: <%= user.role %></p>
+            
+            <form action="/user/photographer" method="get">
+                <button class="btn photo-btn" type="submit">
+                    Photographer Only Link
+                </button>
+            </form>
 
-        <a class="event-link" href="/event">See Events</a>
+            <a class="event-link" href="/event">See Events</a>
 
-        <br><br>
+            <br><br>
 
-        <a href="/user/favourites">
-            <button class="btn favourite-btn" type="submit">
-                My Favourites
-            </button>
-        </a>
-        <form action="/user/logout" method="get">
-            <button class="btn logout-btn" type="submit">
-                Logout
-            </button>
-        </form>
+            <a href="/user/favourites">
+                <button class="btn favourite-btn" type="button"> My Favourites
+                </button>
+            </a>
+            
+            <form action="/user/logout" method="get">
+                <button class="btn logout-btn" type="submit">
+                    Logout
+                </button>
+            </form>
 
+        </div>
     </div>
 
+    <script>
+
+        socket.emit("hello", "Hello From Client");
+
+        // socket.emit("registerUser", "<%= user._id %>");
+
+        socket.on("reply", (msg) => {
+            console.log(msg);
+        });
+    </script>
 </body>
 </html>

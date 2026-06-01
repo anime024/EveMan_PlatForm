@@ -4,6 +4,10 @@ const {Media}=require("../models/media")
 
 const {User}=require("../models/user")
 
+const {rekognitionClient}=require("../services/rekognition")
+const {DetectLabelsCommand}=require("@aws-sdk/client-rekognition")
+
+
 async function handleGetSingleUpload(req, res) {
 
   const event=await Event.findById(req.params.id);
@@ -23,18 +27,47 @@ async function handleGetMultipleUpload(req, res) {
 
 async function handlePostSingleUpload(req,res) {
   try{
-     console.log(req.file);
+    
+    console.log(req.file);
+     console.log("COMPLETE REQ FILE IS HERE :  ",req.file)
     const mediaLocation=req.file.location;
 
-    const {tags}=req.body;
     const user=await User.findOne({email:req.user?.email});
     if(!user)
     {
       console.log(`SOME ERROR IN USER handlePostSingleUpload`)
       return res.json({message:"No user. Login First"})
     }
+    let tag=[];
 
-    const newMedia=await Media.create({event:req.params.id,uploadedBy:user._id,url:mediaLocation,tags:tags? tags.split(','):[]})
+    if(req.file.mimetype.startsWith("image/")){
+      const command=new DetectLabelsCommand({
+      Image:{
+        S3Object:{
+        Bucket:process.env.AWS_BUCKET_NAME,
+        Name:req.file.key,
+      }
+      },
+      MaxLabels:10
+    });
+
+    console.log("Bucket:", process.env.AWS_BUCKET_NAME);
+console.log("Key:", req.file.key);
+console.log("Location:", req.file.location);
+console.log("Region:", process.env.AWS_REGION);
+
+    const response=await rekognitionClient.send(command);
+    if(!response)
+    {
+      console.log("SSome error in handlepostsingleupload NO Response ")
+    }
+    
+     tags=response.Labels.map(label=>label.Name);
+    console.log(tags)
+    }
+
+    
+    const newMedia=await Media.create({event:req.params.id,uploadedBy:user._id,url:mediaLocation,tags})
     await Event.findByIdAndUpdate(req.params.id,{$push:{media:newMedia._id}})
   return res.json({ message: "Single File Uploaded", file: req.file });
   }catch(error){
