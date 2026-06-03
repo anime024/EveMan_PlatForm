@@ -1,84 +1,270 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All Events</title>
+
+<style>
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+        font-family:Arial, Helvetica, sans-serif;
+    }
+
+    body{
+        background:#f4f6f9;
+    }
+
+    .container{
+        width:90%;
+        max-width:1200px;
+        margin:30px auto;
+    }
+
+    h1{
+        text-align:center;
+        margin-bottom:25px;
+        color:#333;
+    }
+
+    .message{
+        background:#d1fae5;
+        color:#065f46;
+        padding:12px;
+        border-radius:8px;
+        margin-bottom:20px;
+        text-align:center;
+    }
+
+    .top-actions{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:15px;
+        flex-wrap:wrap;
+        margin-bottom:25px;
+    }
+
+    .create-btn{
+        background:#2563eb;
+        color:white;
+        text-decoration:none;
+        padding:12px 18px;
+        border-radius:8px;
+        font-weight:600;
+    }
+
+    .filters{
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+    }
+
+    select,
+    input{
+        padding:10px;
+        border:1px solid #ddd;
+        border-radius:8px;
+    }
+
+    button{
+        padding:10px 16px;
+        border:none;
+        background:#2563eb;
+        color:white;
+        border-radius:8px;
+        cursor:pointer;
+    }
+
+    .search-form{
+        display:flex;
+        gap:10px;
+        margin-bottom:30px;
+    }
+
+    .search-form input{
+        flex:1;
+    }
+
+    .events-grid{
+        display:grid;
+        grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+        gap:20px;
+    }
+
+    .event-card{
+        background:white;
+        border-radius:12px;
+        padding:20px;
+        box-shadow:0 4px 12px rgba(0,0,0,0.08);
+        transition:0.3s;
+    }
+
+    .event-card:hover{
+        transform:translateY(-5px);
+    }
+
+    .event-title{
+        color:#222;
+        margin-bottom:10px;
+    }
+
+    .creator{
+        color:#666;
+        margin-bottom:10px;
+        font-size:14px;
+    }
+
+    .category{
+        display:inline-block;
+        background:#e0e7ff;
+        color:#4338ca;
+        padding:5px 10px;
+        border-radius:20px;
+        font-size:13px;
+        margin-bottom:12px;
+    }
+
+    .description{
+        color:#555;
+        margin-bottom:15px;
+        line-height:1.5;
+    }
+
+    .view-btn{
+        display:inline-block;
+        text-decoration:none;
+        background:#2563eb;
+        color:white;
+        padding:10px 14px;
+        border-radius:8px;
+    }
+
+    .empty{
+        text-align:center;
+        color:#777;
+        margin-top:40px;
+    }
+</style>
+
+
 </head>
 <body>
 
-        <%- include('../partials/navbar') %>
 
+<%- include('../partials/navbar') %>
 
-    <% if (message) { %>
-        <h2><%= message %></h2>
+<div class="container">
+
+    <% if(message){ %>
+        <div class="message">
+            <%= message %>
+        </div>
     <% } %>
-
 
     <h1>All Events</h1>
 
-    <form action="/event" method="GET">
+    <div class="top-actions">
 
-    <select name="sort">
+        <a href="/event/create" class="create-btn">
+            + Create Event
+        </a>
 
-        <option value="">
-            Sort Events
-        </option>
+        <form action="/event" method="GET" class="filters">
 
-        <option value="newest">
-            Newest
-        </option>
+            <select name="sort">
 
-        <option value="oldest">
-            Oldest
-        </option>
+                <option value="">
+                    Sort Events
+                </option>
 
-        <option value="category">
-            Category
-        </option>
+                <option value="newest">
+                    Newest First
+                </option>
 
-    </select>
+                <option value="oldest">
+                    Oldest First
+                </option>
 
-    <button type="submit">
-        Apply
-    </button>
+                <option value="category">
+                    Category
+                </option>
 
-</form>
+            </select>
 
-<br>
+            <button type="submit">
+                Apply
+            </button>
 
-    <a href="/event/create">Create New Event</a>
+        </form>
 
-    <form action="/media/search" method="get">
+    </div>
 
-    <input
-        type="text"
-        name="q"
-        placeholder="Search events, users, tags" required>
+    <form action="/media/search" method="GET" class="search-form">
 
-    <button>
-        Search
-    </button>
+        <input
+            type="text"
+            name="q"
+            placeholder="Search events, tags, users..."
+            required
+        >
 
-</form>
+        <button type="submit">
+            Search
+        </button>
 
-    <hr>
+    </form>
 
-    <% allEvents.forEach((event)=>{ %>
+    <% if(allEvents.length === 0){ %>
 
-        <div>
+        <div class="empty">
+            No events found.
+        </div>
 
-            <h2><%= event.title %></h2>
-                <p>Creator: <%= event.createdBy.name %></p>
+    <% } else { %>
 
-            <p>Description:<%= event.description %></p>
-            <p>Category:<%= event.category %></p>
+        <div class="events-grid">
 
-            <a href="/event/<%= event._id %>">View Event</a>
+            <% allEvents.forEach((event)=>{ %>
+
+                <div class="event-card">
+
+                    <h2 class="event-title">
+                        <%= event.title %>
+                    </h2>
+
+                    <p class="creator">
+                        Created by <strong><%= event.createdBy.name %></strong>
+                    </p>
+
+                    <span class="category">
+                        <%= event.category %>
+                    </span>
+
+                    <p class="description">
+                        <%= event.description %>
+                    </p>
+
+                    <a
+                        href="/event/<%= event._id %>"
+                        class="view-btn"
+                    >
+                        View Event
+                    </a>
+
+                </div>
+
+            <% }) %>
 
         </div>
 
-        <hr>
+    <% } %>
 
-    <% }) %>
+</div>
+```
 
 </body>
 </html>

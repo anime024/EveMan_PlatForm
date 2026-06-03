@@ -1,58 +1,190 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Event</title>
 
-    <style>
+<style>
 
-        body{
-            font-family:Arial;
-            padding:40px;
-        }
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+        font-family:Arial, Helvetica, sans-serif;
+    }
 
-        form{
-            width:400px;
-            display:flex;
-            flex-direction:column;
-            gap:10px;
-        }
+    body{
+        background:#f4f6f9;
+        min-height:100vh;
+    }
 
-        input,textarea,select,button{
-            padding:10px;
-        }
+    .container{
+        max-width:700px;
+        margin:40px auto;
+        padding:20px;
+    }
 
-    </style>
+    .form-card{
+        background:white;
+        padding:30px;
+        border-radius:12px;
+        box-shadow:0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    h1{
+        text-align:center;
+        margin-bottom:25px;
+        color:#333;
+    }
+
+    .message{
+        background:#d1fae5;
+        color:#065f46;
+        padding:12px;
+        border-radius:8px;
+        margin-bottom:20px;
+        text-align:center;
+    }
+
+    .form-group{
+        margin-bottom:18px;
+    }
+
+    label{
+        display:block;
+        margin-bottom:8px;
+        font-weight:600;
+        color:#444;
+    }
+
+    input,
+    textarea,
+    select{
+        width:100%;
+        padding:12px;
+        border:1px solid #dcdcdc;
+        border-radius:8px;
+        font-size:15px;
+    }
+
+    textarea{
+        min-height:120px;
+        resize:vertical;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus{
+        outline:none;
+        border-color:#2563eb;
+    }
+
+    .btn{
+        width:100%;
+        padding:14px;
+        border:none;
+        border-radius:8px;
+        background:#2563eb;
+        color:white;
+        font-size:16px;
+        font-weight:600;
+        cursor:pointer;
+        transition:0.3s;
+    }
+
+    .btn:hover{
+        background:#1d4ed8;
+    }
+
+</style>
 
 </head>
 <body>
 
-    <h1>Create Event</h1>
+<%- include('../partials/navbar') %>
 
-    <% if(message){ %>
-        <p><%= message %></p>
-    <% } %>
+<div class="container">
 
-    <form action="/event/create" method="POST">
+    <div class="form-card">
 
-        <input type="text" name="title" placeholder="Event Title">
+        <h1>Create Event</h1>
 
-        <textarea name="description" placeholder="Description"></textarea>
+        <% if(message){ %>
+            <div class="message">
+                <%= message %>
+            </div>
+        <% } %>
 
-        <input type="text" name="category" placeholder="Category">
+        <form action="/event/create" method="POST">
 
-        <input type="date" name="date">
+            <div class="form-group">
+                <label>Event Title</label>
 
-        <select name="visibility">
+                <input
+                    type="text"
+                    name="title"
+                    placeholder="Enter event title"
+                    required
+                >
+            </div>
 
-            <option value="public">Public</option>
+            <div class="form-group">
+                <label>Description</label>
 
-            <option value="private">Private</option>
+                <textarea
+                    name="description"
+                    placeholder="Describe your event..."
+                ></textarea>
+            </div>
 
-        </select>
+            <div class="form-group">
+                <label>Category</label>
 
-        <button type="submit">Create Event</button>
+                <input
+                    type="text"
+                    name="category"
+                    placeholder="Workshop, Trip, Fest, Sports..."
+                >
+            </div>
 
-    </form>
+            <div class="form-group">
+                <label>Event Date</label>
+
+                <input
+                    type="date"
+                    name="date"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label>Visibility</label>
+
+                <select name="visibility">
+
+                    <option value="public">
+                        🌍 Public
+                    </option>
+
+                    <option value="private">
+                        🔒 Private
+                    </option>
+
+                </select>
+            </div>
+
+            <button type="submit" class="btn">
+                Create Event
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+```
 
 </body>
 </html>

@@ -2,6 +2,10 @@ const { Media } = require("../models/media");
 const { User } = require("../models/user");
 const { Event } = require("../models/event");
 const { Notification } = require("../models/notification");
+const { GetObjectCommand } = require("@aws-sdk/client-s3");
+const { client } = require("../config/s3");
+const sharp=require("sharp")
+const {streamToBuffer}=require('../utils/streamToBuffer')
 
 async function handleGetSingleMedia(req, res) {
   const media = await Media.findById(req.params.id)
@@ -52,7 +56,6 @@ async function handlePostLike(req, res) {
       if (mediaOwnerId !== userId.toString()) {
         const message = `${req.user.name} liked your photo`;
 
-        // Save notification
         await Notification.create({
           recipient: mediaOwnerId,
           sender: userId,
@@ -150,9 +153,20 @@ async function handlePostComment(req, res) {
       return res.redirect("/events");
     }
 
+    const tagUserInComment=[...new Set([...req.body.text.matchAll(/@([^\s+]+)/g)].map(match=>match[1]))];
+    console.log(`Tagged users are : ${tagUserInComment}`);
+
+    const taggedUsers=await User.find({
+      email:{$in:tagUserInComment}
+    })
+
+        console.log(`Tagged users from database : ${taggedUsers}`);
+
+
     media.comments.push({
       user: userId,
       text: req.body.text,
+      taggedUsers:taggedUsers.map(user=>user._id)
     });
     await media.save();
     await media.populate("comments.user");
@@ -162,11 +176,30 @@ async function handlePostComment(req, res) {
         message:`${req.user.name} commented ${req.body.text} to your media `
     })
 
+    taggedUsers.forEach(user=>{
+      if(
+        user._id.toString() ===
+        req.user._id.toString()
+    ) return;
+      io.to(user._id.toString()).emit("notification",{message:`${req.user.name} tagged you in a photo`})
+    })
+
+    await Promise.all(taggedUsers.map(user=>
+       Notification.create({
+        recipient:user._id,
+          sender: userId,
+          type: "tag",
+          message:`${req.user.name}: "${req.body.text}"`,
+          media: media._id,
+    })
+    ))
+
+
     await Notification.create({
         recipient: media.uploadedBy,
           sender: userId,
           type: "comment",
-          message:`${req.user.name} commented ${req.body.text} to your media`,
+          message:`${req.user.name}: "${req.body.text}"`,
           media: media._id,
     })
 
@@ -208,7 +241,8 @@ async function handleSearchMedia(req, res) {
     $or: [
       {
         tags: {
-          $in: [query],
+          $regex: query,
+          $options:'i',
         },
       },
       {
@@ -219,6 +253,7 @@ async function handleSearchMedia(req, res) {
       {
         uploadedBy: {
           $in: users.map((u) => u._id),
+          
         },
       },
     ],
@@ -230,6 +265,73 @@ async function handleSearchMedia(req, res) {
   return res.render("media/searchResults", { media, query });
 }
 
+async function handleDownloadMedia(req,res){
+  const media=await Media.findById(req.params.id);
+
+  if(!media){
+    return res.send("Media Not Found");
+  }
+
+const key = decodeURIComponent(
+    media.url.split('/').pop()
+);
+ 
+  const command=new GetObjectCommand({
+    Bucket:process.env.AWS_BUCKET_NAME,
+    Key:key,
+  })
+
+  const response=await client.send(command);
+  const imageBuffer=await streamToBuffer(response.Body);
+
+  const watermarkText = ` CIG CLUB ${req.user.email}`;
+
+const svgWatermark = `
+<svg width="800" height="300">
+    <style>
+        .title {
+            fill: black;            
+            fill-opacity: 0.4;     
+            font-size: 24px;        
+            font-family: Arial, sans-serif;
+        }
+    </style>
+
+    <text
+        x="95%"                     
+        y="10%"                      
+        text-anchor="end"           
+        class="title"
+    >
+        ${watermarkText}
+    </text>
+</svg>
+`;
+
+ const watermarkedImage = await sharp(imageBuffer)
+    .composite([
+        {
+            input: Buffer.from(svgWatermark),
+            gravity: "center",
+        },
+    ])
+    .jpeg()
+    .toBuffer();
+
+    res.setHeader(
+    "Content-Disposition",
+    "attachment; filename=watermarked.jpg"
+);
+
+res.setHeader(
+    "Content-Type",
+    "image/jpeg"
+);
+
+res.send(watermarkedImage);
+
+}
+
 module.exports = {
   handleGetSingleMedia,
   handlePostLike,
@@ -237,4 +339,5 @@ module.exports = {
   handlePostFavourite,
   handlePostComment,
   handleSearchMedia,
+  handleDownloadMedia
 };

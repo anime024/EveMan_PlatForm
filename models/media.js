@@ -29,6 +29,10 @@ const mediaSchema=new mongoose.Schema({
         type:[{user:{type:mongoose.Schema.Types.ObjectId,
         ref:"User"},
         text:String,
+        taggedUsers:{
+        type:[{type:mongoose.Schema.Types.ObjectId,
+        ref:"User"}]
+    },
         createdAt:{
             type:Date,
             default:Date.now,

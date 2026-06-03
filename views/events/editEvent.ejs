@@ -1,53 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Event</title>
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body{
+            background:#f4f6f9;
+            min-height:100vh;
+        }
+
+        .container{
+            max-width:700px;
+            margin:40px auto;
+            padding:20px;
+        }
+
+        .form-card{
+            background:white;
+            padding:30px;
+            border-radius:12px;
+            box-shadow:0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1{
+            text-align:center;
+            margin-bottom:25px;
+            color:#333;
+        }
+
+        .form-group{
+            margin-bottom:18px;
+        }
+
+        label{
+            display:block;
+            margin-bottom:8px;
+            font-weight:600;
+            color:#444;
+        }
+
+        input,
+        textarea,
+        select{
+            width:100%;
+            padding:12px;
+            border:1px solid #dcdcdc;
+            border-radius:8px;
+            font-size:15px;
+        }
+
+        textarea{
+            min-height:120px;
+            resize:vertical;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus{
+            outline:none;
+            border-color:#2563eb;
+        }
+
+        .btn{
+            width:100%;
+            padding:14px;
+            border:none;
+            border-radius:8px;
+            background:#2563eb;
+            color:white;
+            font-size:16px;
+            font-weight:600;
+            cursor:pointer;
+            transition:0.3s;
+        }
+
+        .btn:hover{
+            background:#1d4ed8;
+        }
+    </style>
 </head>
+
 <body>
 
-    <h1>Edit Event</h1>
+    <%- include('../partials/navbar') %>
 
-    <form action="/event/edit/<%= event._id %>" method="POST">
+    <div class="container">
 
-        <input
-            type="text"
-            name="title"
-            value="<%= event.title %>"
-        >
+        <div class="form-card">
 
-        <textarea name="description"><%= event.description %></textarea>
+            <h1>Edit Event</h1>
 
-        <input
-            type="text"
-            name="category"
-            value="<%= event.category %>"
-        >
+            <form action="/event/edit/<%= event._id %>" method="POST">
 
-        <input
-            type="date"
-            name="date"
-            value="<%= event.date.toISOString().split('T')[0] %>"
-        >
+                <div class="form-group">
+                    <label>Event Title</label>
+                    <input
+                        type="text"
+                        name="title"
+                        value="<%= event.title %>"
+                        required
+                    >
+                </div>
 
-        <select name="visibility">
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description"><%= event.description %></textarea>
+                </div>
 
-            <option value="public"
-            <%= event.visibility==="public" ? "selected" : "" %>>
-            Public
-            </option>
+                <div class="form-group">
+                    <label>Category</label>
+                    <input
+                        type="text"
+                        name="category"
+                        value="<%= event.category %>"
+                    >
+                </div>
 
-            <option value="private"
-            <%= event.visibility==="private" ? "selected" : "" %>>
-            Private
-            </option>
+                <div class="form-group">
+                    <label>Event Date</label>
+                    <input
+                        type="date"
+                        name="date"
+                        value="<%= event.date.toISOString().split('T')[0] %>"
+                    >
+                </div>
 
-        </select>
+                <div class="form-group">
+                    <label>Visibility</label>
 
-        <button type="submit">
-            Update Event
-        </button>
+                    <select name="visibility">
 
-    </form>
+                        <option
+                            value="public"
+                            <%= event.visibility === "public" ? "selected" : "" %>>
+                            Public
+                        </option>
+
+                        <option
+                            value="private"
+                            <%= event.visibility === "private" ? "selected" : "" %>>
+                            Private
+                        </option>
+
+                    </select>
+                </div>
+
+                <button class="btn" type="submit">
+                    Update Event
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
 
 </body>
 </html>
