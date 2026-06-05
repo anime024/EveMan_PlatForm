@@ -5,7 +5,12 @@ const { Notification } = require("../models/notification");
 const { GetObjectCommand } = require("@aws-sdk/client-s3");
 const { client } = require("../config/s3");
 const sharp=require("sharp")
+// const ffmpeg=require('fluent-ffmpeg')
 const {streamToBuffer}=require('../utils/streamToBuffer')
+
+const fs=require("fs");
+const path=require('path');
+
 
 async function handleGetSingleMedia(req, res) {
   const media = await Media.findById(req.params.id)
@@ -266,25 +271,29 @@ async function handleSearchMedia(req, res) {
 }
 
 async function handleDownloadMedia(req,res){
-  const media=await Media.findById(req.params.id);
+  const media=await Media.findById(req.params.id).populate("event" , "title");
 
   if(!media){
     return res.send("Media Not Found");
   }
+  
+  const ext=media.url.split('.').pop().toLowerCase();
+  const isVideo=["mp4","mov","avi","webm"].includes(ext);
 
-const key = decodeURIComponent(
-    media.url.split('/').pop()
-);
- 
+  const key = decodeURIComponent(media.url.split('/').pop());
   const command=new GetObjectCommand({
     Bucket:process.env.AWS_BUCKET_NAME,
     Key:key,
   })
 
   const response=await client.send(command);
+  const watermarkText = ` CIG CLUB : ${media.event.title} :${req.user.email}`;
+
+  //for images only 
+  if(!isVideo){{
+
   const imageBuffer=await streamToBuffer(response.Body);
 
-  const watermarkText = ` CIG CLUB ${req.user.email}`;
 
 const svgWatermark = `
 <svg width="800" height="300">
@@ -329,6 +338,36 @@ res.setHeader(
 );
 
 res.send(watermarkedImage);
+}}
+//for videos
+// else
+// {
+//   const videoBuffer=await streamToBuffer(response.Body);
+//   const inputPath=path.join(__dirname,"../temp/input.mp4");
+//   const outputPath = path.join(__dirname,"../temp/output.mp4");
+//   fs.writeFileSync(inputPath,videoBuffer);
+
+//   await new Promise((resolve, reject) => {
+
+//     ffmpeg(inputPath)
+//         .videoFilters(
+//             `drawtext=
+//             text='${watermarkText}':
+//             x=w-tw-20:
+//             y=20:
+//             fontsize=24:
+//             fontcolor=black`
+//         )
+//         .save(outputPath)
+//         .on("end", resolve)
+//         .on("error", reject);
+
+// });
+// return res.download(outputPath, () => {
+//     fs.unlink(inputPath, () => {});
+//     fs.unlink(outputPath, () => {});
+// });
+// }
 
 }
 

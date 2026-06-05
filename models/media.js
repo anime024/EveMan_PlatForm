@@ -17,6 +17,10 @@ const mediaSchema=new mongoose.Schema({
     tags:{
         type:[String],
     },
+    faceIds:{
+        
+            type:[String],
+    },
     likes:{
         type:[{type:mongoose.Schema.Types.ObjectId,
         ref:"User"}]

@@ -1,136 +1,186 @@
 const { upload } = require("../middlewares/upload");
-const {Event}=require("../models/event")
-const {Media}=require("../models/media")
+const { Event } = require("../models/event");
+const { Media } = require("../models/media");
 
-const {User}=require("../models/user")
+const { User } = require("../models/user");
 
-const {rekognitionClient}=require("../services/rekognition")
-const {DetectLabelsCommand}=require("@aws-sdk/client-rekognition")
-
+const { rekognitionClient } = require("../services/rekognition");
+const {
+  DetectLabelsCommand,
+  IndexFacesCommand,
+} = require("@aws-sdk/client-rekognition");
 
 async function handleGetSingleUpload(req, res) {
-
-  const event=await Event.findById(req.params.id);
+  const event = await Event.findById(req.params.id);
   res.render("uploads/single-upload", {
     message:
       "Only One Photo Upload Allowed Go To Upload Multiple if you want to upload many photos at one time ",
-      event:event
+    event: event,
   });
 }
 
 async function handleGetMultipleUpload(req, res) {
+  const event = await Event.findById(req.params.id);
 
-    const event=await Event.findById(req.params.id);
-
-  res.render("uploads/multiple-upload", { message: null,event });
+  res.render("uploads/multiple-upload", { message: null, event });
 }
 
-async function handlePostSingleUpload(req,res) {
-  try{
-    
-    console.log(req.file);
-     console.log("COMPLETE REQ FILE IS HERE :  ",req.file)
-    const mediaLocation=req.file.location;
+async function handlePostSingleUpload(req, res) {
+  try {
+    console.log("COMPLETE REQ FILE IS HERE :  ", req.file);
+    const mediaLocation = req.file.location;
 
-    const user=await User.findOne({email:req.user?.email});
-    if(!user)
-    {
-      console.log(`SOME ERROR IN USER handlePostSingleUpload`)
-      return res.json({message:"No user. Login First"})
+    const user = await User.findOne({ email: req.user?.email });
+    if (!user) {
+      console.log(`SOME ERROR IN USER handlePostSingleUpload`);
+      return res.json({ message: "No user. Login First" });
     }
-    let tag=[];
+    let tags = [];
 
-    if(req.file.mimetype.startsWith("image/")){
-      const command=new DetectLabelsCommand({
-      Image:{
-        S3Object:{
-        Bucket:process.env.AWS_BUCKET_NAME,
-        Name:req.file.key,
+    if (req.file.mimetype.startsWith("image/")) {
+      const command = new DetectLabelsCommand({
+        Image: {
+          S3Object: {
+            Bucket: process.env.AWS_BUCKET_NAME,
+            Name: req.file.key,
+          },
+        },
+        MaxLabels: 10,
+      });
+
+      const responseTags = await rekognitionClient.send(command);
+      if (!responseTags) {
+        console.log("SSome error in handlepostsingleupload NO Response ");
       }
+
+      tags = responseTags.Labels.map((label) => label.Name);
+      console.log(tags);
+    }
+
+    const params = {
+      CollectionId: "cig-face-collection",
+      Image: {
+        S3Object: {
+          Bucket: process.env.AWS_BUCKET_NAME,
+          Name: req.file.key,
+        },
       },
-      MaxLabels:10
+      MaxFaces: 10,
+      Attributes: ["All"],
+    };
+
+    let newMediaFaceIds = [];
+
+    if (req.file.mimetype.startsWith("image/")) {
+      const response = await rekognitionClient.send(
+        new IndexFacesCommand(params),
+      );
+      
+
+      if (response.FaceRecords && response.FaceRecords.length !== 0) {
+        newMediaFaceIds = response.FaceRecords.map(
+          (record) => record.Face.FaceId,
+        );
+      }
+    }
+
+    console.log("Tags:", tags);
+    console.log("Face IDs:", newMediaFaceIds);
+
+    const newMedia = await Media.create({
+      event: req.params.id,
+      uploadedBy: user._id,
+      url: mediaLocation,
+      tags,
+      faceIds: newMediaFaceIds,
     });
-
-    console.log("Bucket:", process.env.AWS_BUCKET_NAME);
-console.log("Key:", req.file.key);
-console.log("Location:", req.file.location);
-console.log("Region:", process.env.AWS_REGION);
-
-    const response=await rekognitionClient.send(command);
-    if(!response)
-    {
-      console.log("SSome error in handlepostsingleupload NO Response ")
-    }
-    
-     tags=response.Labels.map(label=>label.Name);
-    console.log(tags)
-    }
-
-    
-    const newMedia=await Media.create({event:req.params.id,uploadedBy:user._id,url:mediaLocation,tags})
-    await Event.findByIdAndUpdate(req.params.id,{$push:{media:newMedia._id}})
-  return res.json({ message: "Single File Uploaded", file: req.file });
-  }catch(error){
-    console.log("ERROR PCCURED IN  handlePostSingleUpload ",error);
-    return res.json({message:"SOME INTERNAL ERROR "});
+    console.log("Media Uploaded is ", newMedia);
+    await Event.findByIdAndUpdate(req.params.id, {
+      $push: { media: newMedia._id },
+    });
+    return res.json({ message: "Single File Uploaded", file: req.file });
+  } catch (error) {
+    console.log("ERROR PCCURED IN  handlePostSingleUpload ", error);
+    return res.json({ message: "SOME INTERNAL ERROR " });
   }
-   
 }
 
 async function handlePostMultipleUpload(req, res) {
-  try{
+  try {
     console.log(req.files);
 
-  const user=await User.findOne({email:req.user.email});
-  
-  if (!user) {
+    const user = await User.findOne({ email: req.user.email });
+
+    if (!user) {
       console.log(`SOME ERROR IN USER handlePostMultipleUpload`);
       return res.status(401).json({ message: "No user. Login First" });
     }
 
-    const {tags}=req.body;
+    const mediaCreationPromises = req.files.map(async (file) => {
+      let tags = [];
+      let faceIds = [];
+      const mediaLocation = file.location;
 
-    const mediaCreationPromises=req.files.map(async (file)=>{
-      let tags=[];
-      const mediaLocation=file.location;
-
-      if(file.mimetype.startsWith('image/'))
-      {
-        const response=await rekognitionClient.send(
+      // smart tagging
+      if (file.mimetype.startsWith("image/")) {
+        const response = await rekognitionClient.send(
           new DetectLabelsCommand({
-            Image:{
-              S3Object:{
-                Bucket:process.env.AWS_BUCKET_NAME,
-              Name:file.key
-              }
+            Image: {
+              S3Object: {
+                Bucket: process.env.AWS_BUCKET_NAME,
+                Name: file.key,
+              },
             },
-            MaxLabels:10
-          })
-        )
+            MaxLabels: 10,
+          }),
+        );
 
-        tags=response.Labels.map(label=> label.Name)
+        tags = response.Labels.map((label) => label.Name);
+
+        //face recognition
+        const faceResponse = await rekognitionClient.send(
+          new IndexFacesCommand({
+            CollectionId: "cig-face-collection",
+            Image: {
+              S3Object: {
+                Bucket: process.env.AWS_BUCKET_NAME,
+                Name: file.key,
+              },
+            },
+            MaxFaces: 10,
+            Attributes: ["ALL"],
+          }),
+        );
+
+        if (faceResponse.FaceRecords?.length > 0) {
+          faceIds = faceResponse.FaceRecords.map(
+            (record) => record.Face.FaceId,
+          );
+        }
       }
 
       return Media.create({
-        event:req.params.id,
-        uploadedBy:user._id,
-        url:mediaLocation,
-        tags
-      })
-    })
-
-    const savedMediaItems=await Promise.all(mediaCreationPromises);
-
-    const mediaIds=savedMediaItems.map(item=> item._id);
-
-    await Event.findByIdAndUpdate(req.params.id,{$push:{media:{$each:mediaIds}}})
-
-    return res.status(201).json({ 
-      message: "Multiple Files Uploaded and Linked Successfully", 
-      media: savedMediaItems 
+        event: req.params.id,
+        uploadedBy: user._id,
+        url: mediaLocation,
+        tags,
+        faceIds,
+      });
     });
 
-  }catch(error){
+    const savedMediaItems = await Promise.all(mediaCreationPromises);
+
+    const mediaIds = savedMediaItems.map((item) => item._id);
+
+    await Event.findByIdAndUpdate(req.params.id, {
+      $push: { media: { $each: mediaIds } },
+    });
+
+    return res.status(201).json({
+      message: "Multiple Files Uploaded and Linked Successfully",
+      media: savedMediaItems,
+    });
+  } catch (error) {
     console.log("ERROR OCCURRED IN handlePostMultipleUpload ", error);
     return res.status(500).json({ message: "SOME INTERNAL ERROR" });
   }

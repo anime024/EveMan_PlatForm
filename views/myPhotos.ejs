@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Photos</title>
+
+    <style>
+        :root {
+            --bg-color: #fafafa;
+            --card-bg: #ffffff;
+            --text-main: #1a1a1a;
+            --text-muted: #737373;
+            --tag-bg: #f4f4f5;
+            --tag-text: #3f3f46;
+            --border-color: #e4e4e7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.5;
+            /* Ensures content starts below the fixed navbar */
+            padding-top: 80px; 
+        }
+
+        /* Navbar Position Fix */
+        .navbar-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .header {
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+        }
+
+        /* Modern Responsive Grid */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.04);
+        }
+
+        .image-container {
+            width: 100%;
+            height: 260px;
+            background-color: #f4f4f5;
+            overflow: hidden;
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .info {
+            padding: 1.25rem;
+        }
+
+        .event-name {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .uploader {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            background: var(--tag-bg);
+            color: var(--tag-text);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar-container">
+        <%- include('partials/navbar') %>
+    </div>
+
+    <main class="container">
+        <div class="header">
+            <h1>My Photos</h1>
+        </div>
+
+        <div class="gallery">
+            <% photos.forEach(photo => { %>
+                <a href="/media/<%= photo._id %>" class="card-link">
+                    <article class="card">
+                        <div class="image-container">
+                            <img src="<%= photo.url %>" alt="<%= photo.event.title %>">
+                        </div>
+                        <div class="info">
+                            <h2 class="event-name"><%= photo.event.title %></h2>
+                            <p class="uploader">by <%= photo.uploadedBy.name %></p>
+                            
+                            <% if (photo.tags && photo.tags.length > 0) { %>
+                                <div class="tags">
+                                    <% photo.tags.forEach(tag => { %>
+                                        <span class="tag">#<%= tag %></span>
+                                    <% }) %>
+                                </div>
+                            <% } %>
+                        </div>
+                    </article>
+                </a>
+            <% }) %>
+        </div>
+    </main>
+
+</body>
+</html>

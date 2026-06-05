@@ -6,6 +6,7 @@ function setUser(user){
     role:user.role,
     email:user.email,
     name:user.name,
+    profilePhoto:user.profilePhoto
     },process.env.JWT_SECRET)
 }
 

@@ -10,9 +10,20 @@ const UserSchema=new mongoose.Schema({
         required:true,
         unique:true
     },
+    profilePhoto:{
+        type:String,
+    }
+    ,
+    profilePhotoKey:{
+    type:String
+    },
+    faceId:{
+        type:String,
+    }
+    ,
     role: {
       type: String,
-      enum: ["admin", "photographer","member","viewer"],
+      enum: ["admin", "photographer","member","user"],
       default: "user",
     },
     password:{

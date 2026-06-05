@@ -1,141 +1,258 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
 
     <style>
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-            font-family:Arial, sans-serif;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
         }
 
-        body{
-            background-color:#f4f4f4;
+        body {
+            background: #f5f7fa;
             min-height: 100vh;
             display: flex;
-            flex-direction: column; /* Allows navbar at top and content below */
+            flex-direction: column;
         }
 
-        /* NEW CONTAINER: This handles centering your dashboard card below the navbar */
         .main-container {
-            flex: 1; /* Fills remaining height */
+            flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 30px 15px;
         }
 
-        .dashboard{
-            background:white;
-            padding:30px;
-            border-radius:10px;
-            width:380px;
-            text-align:center;
-            box-shadow:0 0 10px rgba(0,0,0,0.1);
+        .dashboard {
+            width: 450px;
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
 
-        h1{
-            margin-bottom:10px;
-            color:#333;
+        .profile-section {
+            text-align: center;
+            margin-bottom: 25px;
         }
 
-        h2{
-            margin-bottom:15px;
-            color:#444;
+        .profile-pic {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #f1f1f1;
+            margin-bottom: 15px;
         }
 
-        p{
-            margin-bottom:10px;
-            color:#666;
+        .profile-section h2 {
+            color: #222;
+            margin-bottom: 6px;
         }
 
-        .btn{
-            padding:10px 18px;
-            border:none;
-            color:white;
-            border-radius:5px;
-            cursor:pointer;
-            font-size:15px;
-            margin:8px;
-            width:80%;
+        .profile-section p {
+            color: #666;
+            margin-bottom: 8px;
+            font-size: 14px;
         }
 
-        .logout-btn{ background:#e74c3c; }
-        .logout-btn:hover{ background:#c0392b; }
-
-        .photo-btn{ background:#3498db; }
-        .photo-btn:hover{ background:#2c80b4; }
-        
-        .favourite-btn{ background:#dfe62c; color: #333; font-weight: bold; } /* Slightly darkened text for visibility */
-        .favourite-btn:hover{ background:#bae52c; }
-
-        .event-link{
-            display:inline-block;
-            margin-top:15px;
-            color:#8b38f8;
-            text-decoration:none;
-            font-weight:bold;
+        .role-badge {
+            display: inline-block;
+            background: #eef2ff;
+            color: #4f46e5;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            margin-top: 5px;
         }
 
-        .event-link:hover{
-            text-decoration:underline;
+        .message {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #16a34a;
+            font-weight: bold;
+        }
+
+        .section-title {
+            margin-bottom: 12px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .action-card {
+            text-decoration: none;
+            color: #333;
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+            transition: 0.2s;
+        }
+
+        .action-card:hover {
+            transform: translateY(-2px);
+            background: white;
+        }
+
+        .action-card .icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .action-card span {
+            display: block;
+            font-weight: 600;
+        }
+
+        .photographer-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            border: none;
+            background: #2563eb;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .photographer-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .logout-btn {
+            width: 100%;
+            margin-top: 15px;
+            padding: 12px;
+            border: none;
+            background: #ef4444;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+        }
+
+        @media(max-width:500px) {
+            .dashboard {
+                width: 100%;
+            }
         }
     </style>
 </head>
 
 <body>
+
     <%- include('partials/navbar') %>
 
     <div class="main-container">
+
         <div class="dashboard">
 
-            <% if (message) { %>
-                <h2><%= message %></h2>
+            <% if(message){ %>
+                <div class="message">
+                    <%= message %>
+                </div>
             <% } %>
 
-            <h1>Dashboard</h1>
+            <div class="profile-section">
 
-            <p>Welcome <%= user.name %></p>
-            <p>Email: <%= user.email %></p>
-            <p>Role: <%= user.role %></p>
-            
-            <form action="/user/photographer" method="get">
-                <button class="btn photo-btn" type="submit">
-                    Photographer Only Link
-                </button>
-            </form>
+                <% if(user.profilePhoto){ %>
+                    <img src="<%= user.profilePhoto %>" alt="Profile" class="profile-pic">
+                <% } else { %>
+                    <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                        alt="Profile"
+                        class="profile-pic">
+                <% } %>
 
-            <a class="event-link" href="/event">See Events</a>
+                <h2><%= user.name %></h2>
 
-            <br><br>
+                <p><%= user.email %></p>
 
-            <a href="/user/favourites">
-                <button class="btn favourite-btn" type="button"> My Favourites
-                </button>
-            </a>
-            
+                <span class="role-badge">
+                    <%= user.role %>
+                </span>
+
+            </div>
+
+            <h3 class="section-title">
+                Quick Actions
+            </h3>
+
+            <div class="action-grid">
+
+                <a href="/event" class="action-card">
+                    
+                    <span>Events</span>
+                </a>
+
+                <a href="/user/favourites" class="action-card">
+                    
+                    <span>Favourites</span>
+                </a>
+
+                <a href="/user/selfie/<%= user._id %>" class="action-card">
+                    
+                    <span>Upload Selfie</span>
+                </a>
+
+                <a href="/user/myphotos/<%= user._id %>" class="action-card">
+                    
+                    <span>My Photos</span>
+                </a>
+
+            </div>
+
+            <% if(user.role==="photographer" || user.role==="admin"){ %>
+
+                <form action="/user/photographer" method="get">
+
+                    <button class="photographer-btn" type="submit">
+                        Photographer Panel
+                    </button>
+
+                </form>
+
+            <% } %>
+
             <form action="/user/logout" method="get">
-                <button class="btn logout-btn" type="submit">
+
+                <button class="logout-btn" type="submit">
                     Logout
                 </button>
+
             </form>
 
         </div>
+
     </div>
 
     <script>
-
         socket.emit("hello", "Hello From Client");
-
-        // socket.emit("registerUser", "<%= user._id %>");
 
         socket.on("reply", (msg) => {
             console.log(msg);
         });
     </script>
+
 </body>
+
 </html>

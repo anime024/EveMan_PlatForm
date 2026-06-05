@@ -1,4 +1,4 @@
-const {RekognitionClient}=require("@aws-sdk/client-rekognition")
+const {RekognitionClient,CreateCollectionCommand}=require("@aws-sdk/client-rekognition")
 
 const rekognitionClient=new RekognitionClient({
     region:process.env.AWS_REGION,
@@ -7,5 +7,6 @@ const rekognitionClient=new RekognitionClient({
         secretAccessKey:process.env.AWS_SECRET_KEY
     }
 })
+
 
 module.exports={rekognitionClient};
