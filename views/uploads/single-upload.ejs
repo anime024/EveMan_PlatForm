@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Single Image & Video Upload with Drag and Drop</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background: #f5f5f5;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    h2 {
+      text-align: center;
+      margin-top: 0;
+    }
+
+    /* Styled Drop Zone Container */
+    .drop-zone {
+      border: 2px dashed #bbb;
+      padding: 30px 20px;
+      text-align: center;
+      background: #fafafa;
+      border-radius: 8px;
+      margin: 20px 0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .drop-zone.drag-over {
+      border-color: #000;
+      background: #f0f0f0;
+    }
+
+    .drop-zone p {
+      margin: 0;
+      font-size: 16px;
+      color: #555;
+    }
+
+    .drop-zone span {
+      display: block;
+      font-size: 13px;
+      color: #888;
+      margin-top: 5px;
+    }
+
+    /* Hide the default input look */
+    #fileInput {
+      display: none;
+    }
+
+    .preview-box {
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Clean modern wrapper for the preview frame */
+    .media-wrapper {
+      position: relative;
+      width: 220px;
+      height: 220px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #ddd;
+      background: #000;
+      cursor: pointer;
+    }
+
+    .media-wrapper img, 
+    .media-wrapper video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .video-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0, 0, 0, 0.75);
+      color: white;
+      padding: 4px 8px;
+      font-size: 10px;
+      border-radius: 4px;
+      font-weight: bold;
+      pointer-events: none;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    button[type="submit"] {
+      padding: 12px 20px;
+      background: black;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      font-weight: bold;
+      width: 100%;
+      font-size: 16px;
+    }
+
+    button[type="submit"]:hover {
+      background: #333;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  
+  <h2><%= event.title%></h2>
+  <h2><%= event._id%></h2>
+
+  <h2>Upload Single Media</h2>
+
+  <form id="uploadForm">
+
+    <div class="drop-zone" id="dropZone">
+      <p>Drag & Drop your image or video here</p>
+      <span>or click to browse files</span>
+      <input type="file" id="fileInput" name="media" accept="image/*,video/*" />
+    </div>
+
+    <div class="preview-box" id="previewBox"></div>
+
+    <button type="submit">Upload</button>
+
+  </form>
+
+</div>
+
+<script>
+  const fileInput = document.getElementById("fileInput");
+  const previewBox = document.getElementById("previewBox");
+  const dropZone = document.getElementById("dropZone");
+  const uploadForm = document.getElementById("uploadForm");
+
+  // Track the singular active file in an accessible variable
+  let activeFile = null;
+
+  // Click on drop box opens selection screen
+  dropZone.addEventListener("click", () => fileInput.click());
+
+  // Block defaults
+  ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
+    dropZone.addEventListener(eventName, (e) => e.preventDefault());
+  });
+
+  // Drag visual helpers
+  ["dragenter", "dragover"].forEach(eventName => {
+    dropZone.addEventListener(eventName, () => dropZone.classList.add("drag-over"));
+  });
+
+  ["dragleave", "drop"].forEach(eventName => {
+    dropZone.addEventListener(eventName, () => dropZone.classList.remove("drag-over"));
+  });
+
+  // Handle Dragged Files
+  dropZone.addEventListener("drop", (e) => {
+    const droppedFiles = e.dataTransfer.files;
+    if (droppedFiles.length > 0) {
+      activeFile = droppedFiles[0];
+      showSinglePreview(activeFile);
+    }
+  });
+
+  // Handle Classic Click Selection
+  fileInput.addEventListener("change", (e) => {
+    if (e.target.files.length > 0) {
+      activeFile = e.target.files[0];
+      showSinglePreview(activeFile);
+    }
+  });
+
+  // Preview renderer
+  function showSinglePreview(file) {
+    previewBox.innerHTML = "";
+
+    const fileURL = URL.createObjectURL(file);
+    const wrapper = document.createElement("div");
+    wrapper.className = "media-wrapper";
+
+    // Build Video Elements
+    if (file.type.startsWith("video/")) {
+      const video = document.createElement("video");
+      video.src = fileURL;
+      video.muted = true;
+      video.playsInline = true;
+      video.preload = "metadata";
+
+      const badge = document.createElement("div");
+      badge.className = "video-badge";
+      badge.innerText = "Video";
+
+      wrapper.appendChild(video);
+      wrapper.appendChild(badge);
+
+      wrapper.addEventListener("mouseenter", () => video.play().catch(() => {}));
+      wrapper.addEventListener("mouseleave", () => video.pause());
+      wrapper.addEventListener("click", () => {
+        video.controls = true;
+        video.muted = false;
+      });
+    } 
+    // Build Image Elements
+    else if (file.type.startsWith("image/")) {
+      const img = document.createElement("img");
+      img.src = fileURL;
+      wrapper.appendChild(img);
+    }
+
+    previewBox.appendChild(wrapper);
+  }
+
+  // Handle JavaScript Fetch Form Submission with status messages
+  uploadForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (!activeFile) {
+      alert("Please select or drop a file before uploading.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("media", activeFile); // Matches your backend's expected file field name
+
+    try {
+      const response = await fetch("/upload/single/<%=event._id%>", {
+        method: "POST",
+        body: formData
+      });
+
+      if (response.ok) {
+        alert("File successfully uploaded!");
+        window.location.href = "/event/<%= event._id %>";
+        
+      } else {
+        alert("Upload failed. Server returned an error.");
+      }
+    } catch (error) {
+      console.error("Submission Error:", error);
+      alert("An error occurred while connecting to the server.");
+    }
+  });
+</script>
+
+</body>
+</html>

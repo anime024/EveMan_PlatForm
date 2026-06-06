@@ -2,9 +2,12 @@ const { Attribute, IndexFacesCommand,SearchFacesByImageCommand } = require("@aws
 const { Media } = require("../models/media");
 const {User}=require("../models/user")
 const {rekognitionClient}=require('../services/rekognition')
+const {setUser}=require("../utils/generateToken")
+
+
 function handleUserDashboard(req,res){
     const user=req.user;
-    console.log(req.body);
+    console.log('USER IS ',user);
     return res.render("dashboard",{message:null,user:user});
 }
 
@@ -13,10 +16,7 @@ function handleUserLogout(req,res){
     return res.redirect('/?msg=Logged out successfully');
 }
 
-function handlePhotoGrapher(req,res){
-    const message=req.query.msg||null;
-    return res.render("photographer",{message});
-}
+
 
 async function handleGetFavourites(req,res){
     const media=await Media.find({favourites:req.user._id});
@@ -71,6 +71,13 @@ async function handlePostSelfie(req,res){
         
         await user.save();
         console.log("User after selfie ", user);
+
+        const token=setUser(user);
+        res.cookie("token",token,{
+            httpOnly:true,
+            secure:false,
+        })
+
           return res.json({ message: "Profile photo Uploaded", file: req.file });
 
 
@@ -137,8 +144,19 @@ async function handleGetMyPhotos(req,res){
     .populate("event")
     .populate("uploadedBy");
 
+    console.log(
+    photos.map(photo => ({
+        id: photo._id,
+        event: photo.event
+    }))
+);
+
+const validPhotos = photos.filter(
+    photo => photo.event
+);
+
     return res.render("myPhotos", {
-            photos
+            photos:validPhotos
         });
      } catch (error) {
         console.log(error);
@@ -149,4 +167,4 @@ async function handleGetMyPhotos(req,res){
 
 }
 
-module.exports={handleUserDashboard,handleUserLogout,handlePhotoGrapher,handleGetFavourites,handleGetSelfie,handlePostSelfie,handleGetMyPhotos}
+module.exports={handleUserDashboard,handleUserLogout,handleGetFavourites,handleGetSelfie,handlePostSelfie,handleGetMyPhotos}

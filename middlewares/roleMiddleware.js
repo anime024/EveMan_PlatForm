@@ -7,7 +7,7 @@ function restrictTo(roles=[]){
 
         if(!roles.includes(req.user.role))
         {
-            return res.send("Access Denied ");
+            return res.render('error',{message:"You Are Not Authorised"});
 
         }
         next();

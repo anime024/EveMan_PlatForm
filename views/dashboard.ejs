@@ -119,21 +119,9 @@
             font-weight: 600;
         }
 
-        .photographer-btn {
-            width: 100%;
-            margin-top: 20px;
-            padding: 12px;
-            border: none;
-            background: #2563eb;
-            color: white;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 15px;
-        }
+        
 
-        .photographer-btn:hover {
-            background: #1d4ed8;
-        }
+        
 
         .logout-btn {
             width: 100%;
@@ -201,7 +189,7 @@
 
                 <a href="/event" class="action-card">
                     
-                    <span>Events</span>
+                    <span>All Events</span>
                 </a>
 
                 <a href="/user/favourites" class="action-card">
@@ -221,17 +209,7 @@
 
             </div>
 
-            <% if(user.role==="photographer" || user.role==="admin"){ %>
-
-                <form action="/user/photographer" method="get">
-
-                    <button class="photographer-btn" type="submit">
-                        Photographer Panel
-                    </button>
-
-                </form>
-
-            <% } %>
+           
 
             <form action="/user/logout" method="get">
 

@@ -162,10 +162,12 @@
         miss out on what's happening around you. Create your free profile today.
       </p>
 
-      <div class="cta-container">
+      <% if (!user) { %>
+       <div class="cta-container">
         <a href="/login" class="btn btn-primary">Login to Account</a>
         <a href="/signup" class="btn btn-secondary">Create Account</a>
       </div>
+      <% } %>
     </div>
   </main>
 

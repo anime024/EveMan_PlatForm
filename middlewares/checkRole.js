@@ -12,7 +12,7 @@ function checkRole(role){
             return next();
         }
         console.log("NOT AUTHORZED");
-         return res.redirect('/?msg=You are not authorized');
+         return res.render('error',{message:" You Are Not Authorized "});
     }
 }
 

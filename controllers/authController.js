@@ -9,16 +9,25 @@ function handleHomePage(req, res) {
 }
 
 function handleLoginPage(req, res) {
-  res.render("login", { message: null });
+  let message=req.query.msg||null;
+  res.render("login", { message });
 }
 
 function handleGetSignUpPage(req, res) {
-  res.render("signup", { message: null });
+  let message=req.query.msg||null;
+  res.render("signup", { message });
 }
 
 async function handlePostSignUpPage(req, res) {
   // console.log(req);
   const { name, email, role, password } = req.body;
+
+  const existingUserAny=await User.findOne({email});
+  if(existingUserAny)
+  {
+    console.log(' USER WITH THIS EMAIL ALREADY EXIST ');
+    return res.redirect('/signup?msg=User with this email already exist ');
+  }
 
   bcrypt.genSalt(saltRounds, function (err, salt) {
     if (err) {
@@ -40,7 +49,7 @@ async function handlePostSignUpPage(req, res) {
         salt: salt,
       });
       console.log("Result:", result);
-      return res.redirect("/login");
+      return res.redirect("/login?msg=Signup Succesfull ");
     });
   });
 }

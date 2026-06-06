@@ -14,6 +14,9 @@ const mediaSchema=new mongoose.Schema({
     url:{
         type:String,
     },
+    key:{
+        type:String,
+    },
     tags:{
         type:[String],
     },

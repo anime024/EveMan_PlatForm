@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Persistent Drag and Drop Bulk Media Upload</title>
+
+  <style>
+    /* Reset & Base Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f3f4f6;
+      color: #1f2937;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* Container Wrapper */
+    .container {
+      max-width: 650px;
+      width: 100%;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Typography */
+    .event-info {
+      text-align: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .event-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 4px;
+    }
+
+    .event-id {
+      font-size: 13px;
+      color: #6b7280;
+      font-family: monospace;
+    }
+
+    h3.form-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 12px;
+    }
+
+    /* Drop Zone Area */
+    .drop-zone {
+      border: 2px dashed #cbd5e1;
+      padding: 35px 20px;
+      text-align: center;
+      background: #f8fafc;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .drop-zone:hover, 
+    .drop-zone.drag-over {
+      border-color: #3b82f6;
+      background: #eff6ff;
+    }
+
+    .drop-zone p {
+      font-size: 15px;
+      font-weight: 500;
+      color: #4b5563;
+    }
+
+    .drop-zone span {
+      display: block;
+      font-size: 13px;
+      color: #9ca3af;
+      margin-top: 6px;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    /* Grid Preview Box */
+    .preview-box {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    /* Individual Media Card */
+    .media-wrapper {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+      background: #000;
+    }
+
+    .media-wrapper img, 
+    .media-wrapper video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Badges and Action UI elements */
+    .video-badge {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      background: rgba(0, 0, 0, 0.75);
+      color: #fff;
+      padding: 3px 6px;
+      font-size: 9px;
+      border-radius: 4px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      pointer-events: none;
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: rgba(239, 68, 68, 0.9);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: background 0.15s;
+    }
+
+    .remove-btn:hover {
+      background: rgb(220, 38, 38);
+    }
+
+    /* Action Buttons */
+    button[type="submit"] {
+      display: block;
+      width: 100%;
+      padding: 12px 20px;
+      background: #111827;
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    button[type="submit"]:hover {
+      background: #1f2937;
+    }
+    
+    button[type="submit"]:active {
+      background: #030712;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="event-info">
+    <h2 class="event-title"><%= event.title %></h2>
+    <div class="event-id">ID: <%= event._id %></div>
+  </div>
+
+  <h3 class="form-title">Upload Multiple Medias</h3>
+
+  <form id="uploadForm">
+
+    <div class="drop-zone" id="dropZone">
+      <p>Drag & Drop your images/videos here</p>
+      <span>or click to browse files</span>
+      <input type="file" id="fileInput" accept="image/*,video/*" multiple />
+    </div>
+
+    <div class="preview-box" id="previewBox"></div>
+
+    <button type="submit">Upload Items</button>
+
+  </form>
+
+</div>
+
+<script>
+  const fileInput = document.getElementById("fileInput");
+  const previewBox = document.getElementById("previewBox");
+  const dropZone = document.getElementById("dropZone");
+  const uploadForm = document.getElementById("uploadForm");
+
+  let allFiles = [];
+
+  dropZone.addEventListener("click", () => fileInput.click());
+
+  ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
+    dropZone.addEventListener(eventName, (e) => e.preventDefault());
+  });
+
+  ["dragenter", "dragover"].forEach(eventName => {
+    dropZone.addEventListener(eventName, () => dropZone.classList.add("drag-over"));
+  });
+
+  ["dragleave", "drop"].forEach(eventName => {
+    dropZone.addEventListener(eventName, () => dropZone.classList.remove("drag-over"));
+  });
+
+  // Handle Dragged Drops
+  dropZone.addEventListener("drop", (e) => {
+    const droppedFiles = e.dataTransfer.files;
+    if (droppedFiles.length > 0) {
+      handleIncomingFiles(droppedFiles);
+    }
+  });
+
+  // Handle Standard File Selections
+  fileInput.addEventListener("change", (e) => {
+    handleIncomingFiles(e.target.files);
+  });
+
+  // Master processing function for new file additions
+  function handleIncomingFiles(files) {
+    Array.from(files).forEach(file => {
+      // Check for duplicates to prevent adding the exact same file twice
+      const isDuplicate = allFiles.some(f => f.name === file.name && f.size === file.size);
+      if (!isDuplicate) {
+        allFiles.push(file);
+      }
+    });
+
+    // Re-render everything to show the updated array collection
+    renderPreviews();
+    
+    // Clear out input value so the change listener triggers normally even if selecting the same file back-to-back
+    fileInput.value = "";
+  }
+
+  // Remove a file from the list if the user changes their mind
+  function removeFile(index) {
+    allFiles.splice(index, 1);
+    renderPreviews();
+  }
+
+  // Pure rendering logic based entirely on the master state array
+  function renderPreviews() {
+    previewBox.innerHTML = ""; 
+
+    allFiles.forEach((file, index) => {
+      const fileURL = URL.createObjectURL(file);
+      const wrapper = document.createElement("div");
+      wrapper.className = "media-wrapper";
+
+      // 1. Setup Media Element
+      if (file.type.startsWith("video/")) {
+        const video = document.createElement("video");
+        video.src = fileURL;
+        video.muted = true;       
+        video.playsInline = true;
+        video.preload = "metadata";
+
+        const badge = document.createElement("div");
+        badge.className = "video-badge";
+        badge.innerText = "Video";
+        
+        wrapper.appendChild(video);
+        wrapper.appendChild(badge);
+
+        wrapper.addEventListener("mouseenter", () => video.play().catch(() => {}));
+        wrapper.addEventListener("mouseleave", () => video.pause());
+        wrapper.addEventListener("click", () => {
+          video.controls = true;
+          video.muted = false;
+        });
+      } else if (file.type.startsWith("image/")) {
+        const img = document.createElement("img");
+        img.src = fileURL;
+        wrapper.appendChild(img);
+      }
+
+      // 2. Add an interactive Remove Button (Changed to a "×" close icon layout)
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "remove-btn";
+      deleteBtn.innerHTML = "&times;";
+      deleteBtn.type = "button";
+      deleteBtn.title = "Remove file";
+      deleteBtn.onclick = (e) => {
+        e.stopPropagation(); // Prevents triggering video expansion/clicks below it
+        removeFile(index);
+      };
+      
+      wrapper.appendChild(deleteBtn);
+      previewBox.appendChild(wrapper);
+    });
+  }
+
+  // 3. Handle Form Submission manually using Fetch
+  uploadForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (allFiles.length === 0) {
+      alert("Please add at least one file before uploading.");
+      return;
+    }
+
+    // Pack up all gathered files cleanly into a standard multipart payload
+    const formData = new FormData();
+    allFiles.forEach(file => {
+      formData.append("medias", file); // Must match the name="medias" parameter your backend expects
+    });
+
+    try {
+      const response = await fetch("/upload/multiple/<%= event._id%>", {
+        method: "POST",
+        body: formData
+      });
+
+      if (response.ok) {
+        alert("All files successfully uploaded!");
+        window.location.href = "/event/<%= event._id %>";
+        
+      } else {
+        alert("Upload failed. Server returned an error.");
+      }
+    } catch (error) {
+      console.error("Submission Error:", error);
+      alert("An error occurred while connecting to the server.");
+    }
+  });
+</script>
+
+</body>
+</html>

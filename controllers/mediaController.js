@@ -293,16 +293,21 @@ async function handleDownloadMedia(req,res){
   if(!isVideo){{
 
   const imageBuffer=await streamToBuffer(response.Body);
+  const image = sharp(imageBuffer);
+const metadata = await image.metadata();
 
+const width = metadata.width;
+const height = metadata.height;
 
 const svgWatermark = `
-<svg width="800" height="300">
+<svg width="${width}" height="${height}">
     <style>
         .title {
             fill: black;            
             fill-opacity: 0.4;     
             font-size: 24px;        
             font-family: Arial, sans-serif;
+            font-weight: bolder;
         }
     </style>
 

@@ -1,11 +1,14 @@
 const {Event}=require("../models/event")
 
 const {User}=require("../models/user")
+const {Media}=require('../models/media')
+
+const {deleteFilesFromS3}=require("../utils/deleteS3Files")
 
 async function handleGetAllEvents(req, res) {
     try{
         const sort=req.query.sort;
-        let sortOption={};
+        let sortOption={createdAt:-1};
         if(sort==="newest")
         {
             sortOption={createdAt:-1}
@@ -28,7 +31,7 @@ async function handleGetAllEvents(req, res) {
             filter={$or:[{visibility:"public"},{createdBy:req.user._id}]}
         }
 
-        const allEvents=await Event.find(filter).sort(sortOption).populate("createdBy","_id name");
+        const allEvents=await Event.find(filter).sort(sortOption).collation({ locale: "en", strength: 2 }).populate("createdBy","_id name");
         const message=req.query.msg||null;
         return res.render("events/allEvents",{allEvents,message,user:req.user})
     }catch(error){
@@ -99,7 +102,18 @@ async function handlePostEditEvent(req, res) {
 async function handlePostDeleteEvent(req, res) {
     try{
 
-        const result=await Event.findByIdAndDelete(req.params.id);
+        const result=await Event.findById(req.params.id).populate("media");
+        if(!result){
+            return res.status(404).send("Event Not Found");
+        }
+
+        const keys=result.media.map(media=> media.key).filter(Boolean);;
+
+        await deleteFilesFromS3(keys);
+
+        await Media.deleteMany({key:{$in:keys}});
+        await Event.findByIdAndDelete(req.params.id);
+
         return res.redirect('/event/?msg=Event Deleted Succesfully ')
     }catch(error){
         console.log(`ERROR IN  deleting  EVENT ${error}`);

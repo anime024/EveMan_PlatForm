@@ -93,6 +93,7 @@ async function handlePostSingleUpload(req, res) {
       url: mediaLocation,
       tags,
       faceIds: newMediaFaceIds,
+      key:req.file.key
     });
     console.log("Media Uploaded is ", newMedia);
     await Event.findByIdAndUpdate(req.params.id, {
