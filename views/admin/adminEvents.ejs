@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Manage Events</title>
+
+<style>
+    *{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#f8fafc;
+}
+
+.container{
+    max-width:1200px;
+    margin:30px auto;
+    padding:0 20px;
+}
+
+/* Header */
+
+.page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.page-header h1{
+    color:#0f172a;
+    font-size:32px;
+}
+
+/* Table Card */
+
+.table-container{
+    background:white;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 4px 15px rgba(0,0,0,0.08);
+}
+
+/* Table */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    background:#0f766e;
+    color:white;
+    padding:18px;
+    text-align:left;
+    font-weight:600;
+}
+
+td{
+    padding:18px;
+    border-bottom:1px solid #e2e8f0;
+}
+
+tr:last-child td{
+    border-bottom:none;
+}
+
+tbody tr{
+    transition:0.2s;
+}
+
+tbody tr:hover{
+    background:#f0fdfa;
+}
+
+/* Event Title */
+
+.event-title{
+    font-weight:600;
+    color:#0f172a;
+}
+
+/* Date */
+
+.event-date{
+    color:#64748b;
+}
+
+/* Visibility Badge */
+
+.visibility{
+    display:inline-block;
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:600;
+}
+
+.public{
+    background:#dcfce7;
+    color:#166534;
+}
+
+.private{
+    background:#fef3c7;
+    color:#92400e;
+}
+
+/* Creator */
+
+.creator{
+    color:#475569;
+}
+
+/* Buttons */
+
+.btn{
+    padding:10px 14px;
+    border:none;
+    border-radius:10px;
+    text-decoration:none;
+    color:white;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:600;
+    transition:0.2s;
+}
+
+/* View */
+
+.view{
+    background:#14b8a6;
+}
+
+.view:hover{
+    background:#0f766e;
+}
+
+/* Edit */
+
+.edit{
+    background:#6366f1;
+}
+
+.edit:hover{
+    background:#4f46e5;
+}
+
+/* Delete */
+
+.delete{
+    background:#f43f5e;
+}
+
+.delete:hover{
+    background:#e11d48;
+}
+
+/* Action Buttons */
+
+.action-buttons{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+/* Empty State */
+
+.empty-state{
+    text-align:center;
+    padding:50px;
+    color:#64748b;
+    font-size:16px;
+}
+
+/* Mobile */
+
+@media(max-width:768px){
+
+    .page-header h1{
+        font-size:26px;
+    }
+
+    table{
+        font-size:14px;
+    }
+
+    td,th{
+        padding:12px;
+    }
+}
+</style>
+
+</head>
+
+<body>
+
+    <%- include('../partials/navbar') %>
+
+   <div class="container">
+
+    <div class="page-header">
+        <h1>Manage Events</h1>
+    </div>
+
+
+<div class="table-container">
+
+<table>
+
+<thead>
+
+<tr>
+    <th>Title</th>
+    <th>Date</th>
+    <th>Visibility</th>
+    <th>Created By</th>
+    <th>Actions</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+
+    <% if(events.length === 0){ %>
+
+<tr>
+    <td colspan="5" class="empty-state">
+        No events found
+    </td>
+</tr>
+
+<% } %>
+
+<% events.forEach(event=>{ %>
+
+<tr>
+
+<td class="event-title">
+    <%= event.title %>
+</td>
+
+<td class="event-date">
+    <%= new Date(event.date).toLocaleDateString() %>
+</td>
+
+<td>
+    <span class="visibility <%= event.visibility %>">
+        <%= event.visibility %>
+    </span>
+</td>
+
+<td class="creator">
+    <%= event.createdBy?.name || "Unknown" %>
+</td>
+
+<td>
+
+<div class="action-buttons">
+
+<a href="/event/<%= event._id %>" class="btn view">
+View
+</a>
+
+<a href="/event/edit/<%= event._id %>" class="btn edit">
+Edit
+</a>
+
+<form
+action="/event/delete/<%= event._id %>"
+method="POST"
+>
+<button class="btn delete">
+Delete
+</button>
+</form>
+
+</div>
+
+</td>
+
+</tr>
+
+<% }) %>
+
+</tbody>
+
+</table>
+</div>
+</body>
+</html>

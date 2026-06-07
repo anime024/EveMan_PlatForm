@@ -1,0 +1,29 @@
+<h1>Change Role</h1>
+
+<form
+action="/admin/users/<%= user._id %>/editRole"
+method="POST"
+>
+
+<select name="role">
+
+    <option value="admin">
+        Admin
+    </option>
+
+    
+    <option value="photographer">
+        Photographer
+    </option>
+
+    <option value="member">Member</option>
+    <option value="user">User</option>
+
+
+</select>
+
+<button>
+Save
+</button>
+
+</form>

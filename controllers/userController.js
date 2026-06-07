@@ -8,7 +8,11 @@ const {setUser}=require("../utils/generateToken")
 function handleUserDashboard(req,res){
     const user=req.user;
     console.log('USER IS ',user);
-    return res.render("dashboard",{message:null,user:user});
+
+    if(user.role==="admin")
+        return res.redirect('/admin/dashboard?msg=Login Succesfull ');
+
+    return res.render("userDashboard",{message:null,user:user});
 }
 
 function handleUserLogout(req,res){
@@ -103,7 +107,7 @@ async function handleGetMyPhotos(req,res){
     console.log("Uswer is ",user)
 
     if(!user.profilePhotoKey){
-        return res.render("dashboard",{message:"Upload your selfie first"})
+        return res.render("userDashboard",{message:"Upload your selfie first"})
     }
     
     const response = await rekognitionClient.send(

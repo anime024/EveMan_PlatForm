@@ -183,6 +183,38 @@ body{
          </a>        
     </div>
 
+    <% if(
+    user &&
+    (
+        user.role === "admin" ||
+        media.uploadedBy?._id.toString() === user._id.toString()
+    )
+){ %>
+
+<div style="margin-bottom:20px;">
+    <form
+        action="/media/delete/<%= media._id %>"
+        method="POST" 
+    >
+        <button
+            type="submit"
+            style="
+                background:#dc2626;
+                color:white;
+                border:none;
+                padding:10px 18px;
+                border-radius:6px;
+                cursor:pointer;
+                font-weight:bold;
+            "
+        >
+            Delete Media
+        </button>
+    </form>
+</div>
+
+<% } %>
+
     
 
     <p>

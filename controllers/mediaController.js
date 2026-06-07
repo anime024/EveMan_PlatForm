@@ -7,7 +7,7 @@ const { client } = require("../config/s3");
 const sharp=require("sharp")
 // const ffmpeg=require('fluent-ffmpeg')
 const {streamToBuffer}=require('../utils/streamToBuffer')
-
+const {deleteFilesFromS3}=require('../utils/deleteS3Files')
 const fs=require("fs");
 const path=require('path');
 
@@ -376,6 +376,38 @@ res.send(watermarkedImage);
 
 }
 
+
+async function handlePostMediaDelete(req,res){
+  const media=await Media.findById(req.params.id);
+
+  if(!media)
+  {
+    console.log("No media found ");
+    return res.redirect('/event?msg=No Media Found');
+  }
+
+  await deleteFilesFromS3([media.key]);
+
+
+  if(media.event){
+    await Event.findByIdAndUpdate(
+        media.event,
+        {
+            $pull: {
+                media: media._id
+            }
+        }
+    );
+}
+
+  
+
+  await Media.findByIdAndDelete(req.params.id);
+
+  return res.redirect('/event?msg=Media Deleted ');
+
+}
+
 module.exports = {
   handleGetSingleMedia,
   handlePostLike,
@@ -383,5 +415,6 @@ module.exports = {
   handlePostFavourite,
   handlePostComment,
   handleSearchMedia,
-  handleDownloadMedia
+  handleDownloadMedia,
+  handlePostMediaDelete
 };

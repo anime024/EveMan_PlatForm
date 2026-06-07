@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Users</title>
+
+    <style>
+        body{
+    font-family:Arial,sans-serif;
+    background:#f8fafc;
+    margin:0;
+    padding:0;
+}
+
+.page-content{
+    max-width:1200px;
+    margin:30px auto;
+    padding:0 20px;
+}
+
+h1{
+    color:#0f172a;
+    margin-bottom:25px;
+    font-size:32px;
+}
+
+.table-container{
+    background:white;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 4px 15px rgba(0,0,0,0.08);
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    background:#0f766e;
+    color:white;
+    padding:16px;
+    text-align:left;
+    font-weight:600;
+}
+
+td{
+    padding:16px;
+    border-bottom:1px solid #e2e8f0;
+}
+
+tr:last-child td{
+    border-bottom:none;
+}
+
+tbody tr{
+    transition:0.2s;
+}
+
+tbody tr:hover{
+    background:#f0fdfa;
+}
+
+/* User Info */
+.user-name{
+    font-weight:600;
+    color:#0f172a;
+}
+
+.user-email{
+    color:#64748b;
+}
+
+.role{
+    display:inline-block;
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:600;
+    background:#ecfeff;
+    color:#0f766e;
+}
+
+.btn{
+    padding:10px 14px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    text-decoration:none;
+    font-size:14px;
+    font-weight:600;
+    transition:0.2s;
+}
+
+.edit-btn{
+    background:#14b8a6;
+    color:white;
+}
+
+.edit-btn:hover{
+    background:#0f766e;
+}
+
+.delete-btn{
+    background:#f43f5e;
+    color:white;
+}
+
+.delete-btn:hover{
+    background:#e11d48;
+}
+
+.action-buttons{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+@media(max-width:768px){
+
+    body{
+        padding:20px 10px;
+    }
+
+    table{
+        font-size:14px;
+    }
+
+    td,th{
+        padding:12px;
+    }
+}
+    </style>
+
+</head>
+<body>
+
+    <%- include('../partials/navbar') %>
+
+    <main class="page-content">
+
+
+<h1>Manage Users</h1>
+
+<div class="table-container">
+
+<table>
+
+<thead>
+<tr>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Role</th>
+    <th>Actions</th>
+</tr>
+</thead>
+
+<tbody>
+
+<% users.forEach(user=>{ %>
+
+<tr>
+
+    <td class="user-name">
+        <%= user.name %>
+    </td>
+
+    <td class="user-email">
+        <%= user.email %>
+    </td>
+
+    <td>
+        <span class="role">
+            <%= user.role %>
+        </span>
+    </td>
+
+    <td>
+        <div class="action-buttons">
+
+            <a
+            href="/admin/users/<%= user._id %>/editRole"
+            class="btn edit-btn">
+            Change Role
+            </a>
+
+            <form
+            action="/admin/users/<%= user._id %>/delete"
+            method="POST">
+
+                <button class="btn delete-btn">
+                    Delete
+                </button>
+
+            </form>
+
+        </div>
+    </td>
+
+</tr>
+
+<% }) %>
+
+</tbody>
+
+</table>
+
+</div>
+
+</tbody>
+
+</table>
+ </main>
+
+</body>
+</html>

@@ -76,7 +76,11 @@ async function handlePostLogin(req, res) {
             secure:false,
         })
       console.log(`user found ${user}`);
-      return res.render("dashboard", { message: null,token:token,user});
+
+      if(user.role==='admin')
+        return res.redirect('/admin/dashboard?msg=Login Succesfull')
+
+      return res.render("userDashboard", { message: null,token:token,user});
     } else {
       console.log("wrong password");
       return res.render("login", { message: "WRONG PASSWORD" });

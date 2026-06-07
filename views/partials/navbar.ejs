@@ -147,6 +147,7 @@ body {
 @media(max-width: 768px) {
     .navbar-toggle {
         display: block;
+        color: #050507;
     }
 
     .navbar-links {
@@ -177,7 +178,7 @@ body {
         position: static; /* Allows it to stack natively inside the mobile tray */
         width: 100%;
         box-shadow: none;
-        border: 1px solid #e5e7eb;
+        border: 1px solid #050507;
         margin-top: 5px;
     }
 }
@@ -192,37 +193,96 @@ body {
         </button>
 
         <ul class="navbar-links" id="navbarLinks">
-            <li><a href="/">Home</a></li>
-            <li><a href="/event">All Events</a></li>
 
-            <% if(user){ %>
-                <li><a href="/user/dashboard">Dashboard</a></li>
-                <li><a href="/user/favourites">Favourites</a></li>
+    <li><a href="/">Home</a></li>
+    <li><a href="/event">All Events</a></li>
 
-                <li class="dropdown">
-                    <a href="#" onclick="toggleNotifications(event)">
-                        Notifications <span id="notificationCount"></span>
-                    </a>
-                    <div id="notificationDropdown" class="notification-dropdown">
-                        <div class="notification-header">
-                            Notifications
-                        </div>
-                        <ul id="notificationList" class="notification-list">
-                            </ul>
-                        <div class="notification-footer">
-                            <a href="/notification" class="btn-notification">
-                                See All Unread Notifications
-                            </a>
-                        </div>
+    <% if(user){ %>
+
+        <% if(user.role === "admin"){ %>
+
+            <li>
+                <a href="/admin/dashboard">
+                    Admin Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="/admin/users">
+                    Manage Users
+                </a>
+            </li>
+
+            <li>
+                <a href="/admin/events">
+                    Manage Events
+                </a>
+            </li>
+
+        <% } else { %>
+
+            <li>
+                <a href="/user/dashboard">
+                    Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="/user/favourites">
+                    Favourites
+                </a>
+            </li>
+
+            <!-- Your existing notification code -->
+            <li class="dropdown">
+                <a href="#" onclick="toggleNotifications(event)">
+                    Notifications
+                    <span id="notificationCount"></span>
+                </a>
+
+                <div id="notificationDropdown" class="notification-dropdown">
+
+                    <div class="notification-header">
+                        Notifications
                     </div>
-                </li>
 
-                <li><a href="/user/logout" class="btn-danger">Logout</a></li>
-            <% } else { %>
-                <li><a href="/login">Login</a></li>
-                <li><a href="/signup" class="btn-accent">Sign Up</a></li>
-            <% } %>
-        </ul>
+                    <ul id="notificationList" class="notification-list">
+                    </ul>
+
+                    <div class="notification-footer">
+                        <a href="/notification" class="btn-notification">
+                            See All Unread Notifications
+                        </a>
+                    </div>
+
+                </div>
+            </li>
+
+        <% } %>
+
+        <li>
+            <a href="/user/logout" class="btn-danger">
+                Logout
+            </a>
+        </li>
+
+    <% } else { %>
+
+        <li>
+            <a href="/login">
+                Login
+            </a>
+        </li>
+
+        <li>
+            <a href="/signup" class="btn-accent">
+                Sign Up
+            </a>
+        </li>
+
+    <% } %>
+
+</ul>
     </div>
 </nav>
 

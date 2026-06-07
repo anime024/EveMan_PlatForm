@@ -102,6 +102,7 @@ async function handlePostEditEvent(req, res) {
 async function handlePostDeleteEvent(req, res) {
     try{
 
+        const user=req.user; 
         const result=await Event.findById(req.params.id).populate("media");
         if(!result){
             return res.status(404).send("Event Not Found");
@@ -113,6 +114,11 @@ async function handlePostDeleteEvent(req, res) {
 
         await Media.deleteMany({key:{$in:keys}});
         await Event.findByIdAndDelete(req.params.id);
+
+        if(user.role==="admin")
+        {
+            return res.redirect('/admin/events?msg=Event Deleted Succesfully ');
+        }
 
         return res.redirect('/event/?msg=Event Deleted Succesfully ')
     }catch(error){

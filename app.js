@@ -37,7 +37,7 @@ const {eventRouter}=require("./routes/eventRoute")
 const {uploadRouter}=require("./routes/uploadRoutes")
 const {mediaRouter}=require('./routes/mediaRoutes')
 const {notificationRouter}=require("./routes/notificationRoute")
-
+const {adminRouter}=require('./routes/adminRoute')
 
 app.get("/test",(req,res)=>{
 
@@ -54,12 +54,13 @@ app.get("/test",(req,res)=>{
 });
 
 
-app.use("/",authRouter)
 app.use("/user",userRouter);
 app.use('/event',eventRouter)
 app.use('/upload',uploadRouter);
 app.use('/media',mediaRouter)
 app.use('/notification',notificationRouter)
+app.use('/admin',adminRouter);
+app.use("/",authRouter)
 
 app.get("/",(req,res)=>{
     res.render("homepage",{message:null});
