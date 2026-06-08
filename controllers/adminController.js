@@ -19,7 +19,7 @@ async function handleAdminDashboard(req, res) {
 
 async function handleAdminUser(req, res) {
   let message = req.query.msg || null;
-  const users = await User.find();
+  const users = await User.find().sort({ createdAt: -1 });
 
   if (!users) {
     return res.redirect("/admin/dashboard?msg=No User Found ");
@@ -35,7 +35,7 @@ async function handleGetEditRole(req, res) {
     return res.redirect("/admin/users?msg=No User found ");
   }
 
-  return res.render("admin/editRole", { user, message });
+  return res.render("admin/editRole", { editUser:user, message });
 }
 
 async function handlePostEditRole(req, res) {

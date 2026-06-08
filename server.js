@@ -39,19 +39,19 @@ const {mediaRouter}=require('./routes/mediaRoutes')
 const {notificationRouter}=require("./routes/notificationRoute")
 const {adminRouter}=require('./routes/adminRoute')
 
-app.get("/test",(req,res)=>{
+// app.get("/test",(req,res)=>{
 
-    const io = req.app.get("io");
+//     const io = req.app.get("io");
 
-    console.log("TEST ROUTE HIT");
+//     console.log("TEST ROUTE HIT");
 
-    io.emit("notification",{
-        message:"GLOBAL TEST"
-    });
+//     io.emit("notification",{
+//         message:"GLOBAL TEST"
+//     });
 
-    res.send("sent");
+//     res.send("sent");
 
-});
+// });
 
 
 app.use("/user",userRouter);

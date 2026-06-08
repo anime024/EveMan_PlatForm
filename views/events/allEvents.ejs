@@ -230,9 +230,11 @@ button:hover{
 
     <div class="top-actions">
 
-        <a href="/event/create" class="create-btn">
+        <% if (user.role=="admin" || user.role==="photographer") { %>
+         <a href="/event/create" class="create-btn">
             + Create Event
         </a>
+        <% } %>
 
         <form action="/event" method="GET" class="filters">
 

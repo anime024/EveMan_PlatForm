@@ -48,7 +48,6 @@ async function handlePostSignUpPage(req, res) {
         password: hash,
         salt: salt,
       });
-      console.log("Result:", result);
       return res.redirect("/login?msg=Signup Succesfull ");
     });
   });
@@ -56,7 +55,6 @@ async function handlePostSignUpPage(req, res) {
 
 async function handlePostLogin(req, res) {
   const { email, password } = req.body;
-  console.log(email, password);
   if (!email || !password) {
     console.log("no email or password ");
     return res.render("login", { message: "NO EMAIL OR PASSWORD" });

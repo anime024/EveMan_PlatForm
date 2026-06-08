@@ -1,29 +1,199 @@
-<h1>Change Role</h1>
 
-<form
-action="/admin/users/<%= user._id %>/editRole"
-method="POST"
->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Change Role</title>
 
-<select name="role">
+<style>
+    *{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
 
-    <option value="admin">
-        Admin
-    </option>
+body{
+    background:#f5f7fa;
+    min-height:100vh;
+}
 
-    
-    <option value="photographer">
-        Photographer
-    </option>
+.container{
+    max-width:700px;
+    margin:30px auto;
+    padding:0 20px;
+}
 
-    <option value="member">Member</option>
-    <option value="user">User</option>
+.role-card{
+    background:white;
+    border-radius:18px;
+    padding:30px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.08);
+}
 
+.page-title{
+    color:#1e293b;
+    margin-bottom:25px;
+    font-size:32px;
+}
 
-</select>
+.user-info{
+    background:#fafafa;
+    border:1px solid #eef2f7;
+    border-radius:12px;
+    padding:18px;
+    margin-bottom:25px;
+}
 
-<button>
-Save
-</button>
+.user-info p{
+    color:#393d43;
+    margin-bottom:8px;
+}
 
-</form>
+.user-info strong{
+    color:#0f172a;
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:25px;
+}
+
+label{
+    color:#1e293b;
+    font-weight:600;
+}
+
+select{
+    width:100%;
+    padding:14px;
+    border:1px solid #d1d5db;
+    border-radius:10px;
+    font-size:15px;
+    outline:none;
+    transition:0.2s;
+}
+
+select:focus{
+    border-color:#d7e542;
+}
+
+.btn{
+    display:inline-block;
+    border:none;
+    background:#4bdc74;
+    color:white;
+    padding:12px 20px;
+    border-radius:10px;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.btn:hover{
+    background:#4bdc74;
+}
+
+.role-badge{
+    display:inline-block;
+    background:#ede9fe;
+    color:#4bdc74;
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:14px;
+    font-weight:600;
+}
+
+@media(max-width:768px){
+
+    .page-title{
+        font-size:26px;
+    }
+
+    .role-card{
+        padding:22px;
+    }
+}
+</style>
+
+</head>
+<body>
+    <%- include('../partials/navbar') %>
+
+<div class="container">
+
+    <h1 class="page-title">
+        Change User Role
+    </h1>
+
+    <div class="role-card">
+
+        <div class="user-info">
+            <p>
+                Current Role:
+                <span class="role-badge">
+                    <%= editUser.role %>
+                </span>
+            </p>
+
+            <p>
+                User ID:
+                <strong><%= editUser._id %></strong>
+            </p>
+
+            <% if(editUser.email){ %>
+                <p>
+                    Email:
+                    <strong><%= editUser.email %></strong>
+                </p>
+            <% } %>
+        </div>
+
+        <form
+        action="/admin/users/<%= editUser._id %>/editRole"
+        method="POST">
+
+            <div class="form-group">
+
+                <label>Select New Role</label>
+
+                <select name="role">
+
+                    <option value="admin"
+                    <%= editUser.role === 'admin' ? 'selected' : '' %>>
+                        Admin
+                    </option>
+
+                    <option value="photographer"
+                    <%= editUser.role === 'photographer' ? 'selected' : '' %>>
+                        Photographer
+                    </option>
+
+                    <option value="member"
+                    <%= editUser.role === 'member' ? 'selected' : '' %>>
+                        Member
+                    </option>
+
+                    <option value="user"
+                    <%= editUser.role === 'user' ? 'selected' : '' %>>
+                        User
+                    </option>
+
+                </select>
+
+            </div>
+
+            <button type="submit" class="btn">
+                Save Changes
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+</body>
+</html>

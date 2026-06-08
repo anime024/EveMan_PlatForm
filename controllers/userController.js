@@ -7,8 +7,7 @@ const {setUser}=require("../utils/generateToken")
 
 function handleUserDashboard(req,res){
     const user=req.user;
-    console.log('USER IS ',user);
-
+    
     if(user.role==="admin")
         return res.redirect('/admin/dashboard?msg=Login Succesfull ');
 

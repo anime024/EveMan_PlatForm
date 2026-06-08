@@ -233,6 +233,7 @@ async function handleSearchMedia(req, res) {
       $regex: query,
       $options: "i",
     },
+    visibility:"public"
   });
 
   const users = await User.find({

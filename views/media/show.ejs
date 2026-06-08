@@ -285,17 +285,15 @@ body{
                     </div>
                 <% }) %>
             <% } else { %>
-                <p style="color: #666; font-style: italic; margin-top: 15px;">No comments yet. Write the first one!</p>
+                <p id="noCommentsMessage" style="color: #666; font-style: italic; margin-top: 15px;">No comments yet. Write the first one!</p>
             <% } %>
         </div>
     </div>
 </div>
     <script>
 
-        console.log("SCRIPT LOADED");
 
         async function addComment(mediaId) {
-    console.log("ADD COMMENT CLICKED");
         }
 async function likeMedia(mediaId) {
     try {
@@ -308,13 +306,11 @@ async function likeMedia(mediaId) {
         });
 
         if (response.ok) {
-            // Parse the JSON object sent by your backend controller
             const data = await response.json(); 
             
-            // Find the span tag and update the number dynamically!
             document.getElementById('likeCount').innerText = data.likesCount;
             
-            console.log("✅ Background like recorded. Total likes now:", data.likesCount);
+            console.log(" Background like recorded. Total likes now:", data.likesCount);
         } else {
             console.error("Backend returned an error status:", response.status);
         }
@@ -391,6 +387,13 @@ async function addComment(mediaId) {
 
         const commentsContainer =
             document.getElementById("commentsContainer");
+
+            const noCommentsMessage =
+    document.getElementById("noCommentsMessage");
+
+if (noCommentsMessage) {
+    noCommentsMessage.remove();
+}
 
         commentsContainer.insertAdjacentHTML(
             "afterbegin",
