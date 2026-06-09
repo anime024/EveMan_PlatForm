@@ -246,6 +246,8 @@ Managing this media across multiple cloud drives and personal folders becomes di
 }
 ```
 
+---
+
 ## Folder Structure
 
 ```text
