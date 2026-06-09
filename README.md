@@ -235,7 +235,6 @@ Managing this media across multiple cloud drives and personal folders becomes di
 
 ### Notification
 
----
 ```javascript
 {
     recipient,
