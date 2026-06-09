@@ -233,8 +233,19 @@ Managing this media across multiple cloud drives and personal folders becomes di
 }
 ```
 
+### Notification
 
 ---
+```javascript
+{
+    recipient,
+    sender,
+    type,
+    message,
+    isRead,
+    media,
+}
+```
 
 ## Folder Structure
 
