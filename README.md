@@ -180,16 +180,7 @@ Managing this media across multiple cloud drives and personal folders becomes di
 
 ## System Architecture
 
-```text
-Client Browser
-       |
-       ▼
-Express.js Server
-       |
-       ├── MongoDB Database
-       |
-       └── AWS S3 Storage
-```
+![Architecture Diagram](screenshots/architecture-diagram.png)
 
 ---
 
